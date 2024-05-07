@@ -95,7 +95,7 @@ function initBoard() {
 
 document.addEventListener('DOMContentLoaded', async function() {
     // alert('DOMContentLoaded');
-    await sleep(3000);
+    await sleep(8000);
     board_num = Math.floor(Math.random() * Object.keys(initBoardList).length);
     // board_num=6069;
     str_board = initBoardList[String(board_num)] + '100000';
