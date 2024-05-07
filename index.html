@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>3路盤 詰碁ゲーム</title>
+    <style>
+      .board {
+        background-image: url("goban.png"); /* 碁盤画像 */
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: repeat(3, 1fr);
+        width: 225px;
+        height: 225px;
+        position: relative;
+      }
+      .cell {
+        width: 75px;
+        height: 75px;
+        position: relative;
+      }
+      .stone {
+        width: 75px;
+        height: 75px;
+        border-radius: 50%;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+      .black {
+        background-color: #000;
+      }
+      .white {
+        background-color: #fff;
+      }
+      .red {
+        background-color: #f00;
+      }
+      #history {
+        width: 450px;
+        height: 150px;
+        border: 1px solid #000;
+        overflow-y: auto; /* 履歴が多くなった場合にスクロール */
+      }
+    </style>
+  </head>
+  <body>
+    <h2>3路盤 詰碁ゲーム</h2>
+    <p>ページを読み込むごとに約 40 MB の通信量が発生します。ご注意ください。</p>
+    <div id="boardNumForm">
+      <input
+        type="number"
+        id="boardNum"
+        min="0"
+        max="5025"
+        placeholder="Board Number (0-5025)"
+      />
+      <button onclick="initBoard()">決定</button>
+    </div>
+    <div id="board_num_str">board:</div>
+    <div id="board" class="board">
+      <!-- JavaScriptで碁盤を生成 -->
+    </div>
+    <div id="history">Move History:</div>
+    <button id="pass">pass</button>
+    <script src="app.js"></script>
+  </body>
+</html>
