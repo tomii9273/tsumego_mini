@@ -1,6 +1,6 @@
 const size = 3;
 const N = size;
-let initBoardList = null; // グローバル変数を初期化
+const n_board = 5026
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -13,30 +13,15 @@ const DI = [
     [-1, 0]  // 上へ移動
 ];
 
-fetch("filtered_init_boards.json")
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('ネットワーク応答が正しくありません。');
-        }
-        return response.json();
-    })
-    .then(data => {
-        initBoardList = data; // 読み込んだデータをグローバル変数に保存
-        console.log('Data loaded into global variable:', initBoardList);
-    })
-    .catch(error => {
-        console.error('データの取得中にエラーが発生しました:', error);
-    });
-
 var board_num = 0;
 var str_board = "";
 var hama_sente = 0;
 var hama_gote = 0;
 var isLocked = false; // ロック状態の管理
 
-function initBoard() {
+async function initBoard() {
     board_num = document.getElementById('boardNum').value; // 0-indexed
-    str_board = initBoardList[String(board_num)] + '100000';
+    str_board = (await getBoardStr(board_num))["board_str"] + '100000';
     isLocked = false;
     hama_sente = 0;
     hama_gote = 0;
@@ -76,10 +61,8 @@ function initBoard() {
 
 document.addEventListener('DOMContentLoaded', async function() {
     // alert('DOMContentLoaded');
-    await sleep(1000);
-    board_num = Math.floor(Math.random() * Object.keys(initBoardList).length);
-    // board_num=6069;
-    str_board = initBoardList[String(board_num)] + '100000';
+    board_num = Math.floor(Math.random() * n_board);
+    str_board = (await getBoardStr(board_num))["board_str"] + '100000';
     const board = document.getElementById('board');
     const historyDiv = document.getElementById('history'); // 履歴表示用のdiv
     const boardNumDiv = document.getElementById('board_num_str'); // 履歴表示用のdiv
@@ -555,6 +538,35 @@ async function placeStone(board) {
     try {
         // fetch APIを使用してサーバーにPOSTリクエストを送信
         const response = await fetch('/get_message', {
+            method: 'POST',             // HTTPメソッドをPOSTに設定
+            headers: {
+                'Content-Type': 'application/json'  // コンテンツタイプをJSONに設定
+            },
+            body: JSON.stringify(data)  // JavaScriptオブジェクトをJSON文字列に変換
+        });
+
+        // レスポンスをJSONとしてパース
+        const responseData = await response.json();
+        // console.log('Server response:', responseData);
+        
+        // サーバーからのレスポンスメッセージを関数の戻り値として返す
+        return responseData;
+    } catch (error) {
+        // エラーが発生した場合、エラーメッセージをコンソールに出力
+        console.error('Error:', error);
+        return null; // エラーが発生した場合はnullを返す
+    }
+}
+
+
+
+async function getBoardStr(num) {
+    // サーバーに送るデータを準備
+    const data = { num: num };
+
+    try {
+        // fetch APIを使用してサーバーにPOSTリクエストを送信
+        const response = await fetch('/get_board_str', {
             method: 'POST',             // HTTPメソッドをPOSTに設定
             headers: {
                 'Content-Type': 'application/json'  // コンテンツタイプをJSONに設定

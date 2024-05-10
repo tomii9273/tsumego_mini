@@ -35,5 +35,21 @@ def get_message():
         return jsonify({"message": "No message found for this coordinate."})
 
 
+@app.route("/get_board_str", methods=["POST"])
+def get_board_str():
+    data = request.json
+    num = data["num"]
+    conn = psycopg2.connect(DATABASE_URL, sslmode="require")
+    cur = conn.cursor()
+    cur.execute(f"SELECT board FROM filtered_init_boards WHERE num = {num}")
+    row = cur.fetchone()
+    cur.close()
+    conn.close()
+    if row:
+        return jsonify({"board_str": row[0]})
+    else:
+        return jsonify({"message": "No message found for this coordinate."})
+
+
 if __name__ == "__main__":
     app.run(debug=True)
