@@ -1,9 +1,6 @@
 const size = 3;
 const N = size;
-let globalData = null; // グローバル変数を初期化
 let initBoardList = null; // グローバル変数を初期化
-let jsonName = `data_${size}.json`; // データファイルの名前
-// let jsonName = `test.json`; // データファイルの名前
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -26,22 +23,6 @@ fetch("filtered_init_boards.json")
     .then(data => {
         initBoardList = data; // 読み込んだデータをグローバル変数に保存
         console.log('Data loaded into global variable:', initBoardList);
-    })
-    .catch(error => {
-        console.error('データの取得中にエラーが発生しました:', error);
-    });
-
-
-fetch(jsonName)
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('ネットワーク応答が正しくありません。');
-        }
-        return response.json();
-    })
-    .then(data => {
-        globalData = data; // 読み込んだデータをグローバル変数に保存
-        console.log('Data loaded into global variable:', globalData);
     })
     .catch(error => {
         console.error('データの取得中にエラーが発生しました:', error);
@@ -95,7 +76,7 @@ function initBoard() {
 
 document.addEventListener('DOMContentLoaded', async function() {
     // alert('DOMContentLoaded');
-    await sleep(8000);
+    await sleep(1000);
     board_num = Math.floor(Math.random() * Object.keys(initBoardList).length);
     // board_num=6069;
     str_board = initBoardList[String(board_num)] + '100000';
@@ -104,8 +85,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     const boardNumDiv = document.getElementById('board_num_str'); // 履歴表示用のdiv
     const passButton = document.getElementById('pass'); // passボタンを取得
 
-    boardNumDiv.innerHTML += String(board_num) + " " + str_board + " " + globalData[str_board][0];
-    
+    let scorexy = await placeStone(str_board);
+    boardNumDiv.innerHTML += String(board_num) + " " + str_board + " " + scorexy["score"];
 
     // // 盤面の反映
     // for (let ii = 0; ii < size*size; ii++) {
@@ -159,7 +140,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             nextCell.appendChild(stone);
         }
 
-        cell.addEventListener('click', function() {
+        cell.addEventListener('click', async function() {
             if (isLocked) return;
             if (!this.firstChild) { // すでに石が置かれていないことを確認
                 // const stone = document.createElement('div');
@@ -225,8 +206,11 @@ document.addEventListener('DOMContentLoaded', async function() {
 
                 // 相手の番
                 if (!isLocked) {
-                    let score = 0;
-                    [score, row, col] = globalData[str_board];
+                    let scorexy = await placeStone(str_board);
+                    let score = scorexy["score"];
+                    row = scorexy["x"];
+                    col = scorexy["y"];
+                    
                     let j = row * size + col;
                     // const nextCell = board.children[j];
                     // const nextStone = document.createElement('div');
@@ -332,7 +316,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         
     }
 
-    passButton.addEventListener('click', function() {
+    passButton.addEventListener('click', async function() {
         // historyDiv.innerHTML += "<br>パスボタンを押した";
         if (isLocked) return;
         historyDiv.innerHTML += "<br>黒はパスをした";
@@ -349,11 +333,12 @@ document.addEventListener('DOMContentLoaded', async function() {
 
         // 相手の番
         if (!isLocked) {
-            let score = 0;
-            let row = -1;
-            let col = -1;
             let taken_stones = 0;
-            [score, row, col] = globalData[str_board];
+            // [score, row, col] = globalData[str_board];
+            let scorexy = await placeStone(str_board);
+            let score = scorexy["score"];
+            let row = scorexy["x"];
+            let col = scorexy["y"];
             let j = row * size + col;
             // const nextCell = board.children[j];
             // const nextStone = document.createElement('div');
@@ -560,4 +545,32 @@ function takeStone(pi, pj, board_str) {
     board_str_ans += board_str.substr(N * N);
 
     return [board_str_ans, Q.length];
+}
+
+
+async function placeStone(board) {
+    // サーバーに送るデータを準備
+    const data = { board: board };
+
+    try {
+        // fetch APIを使用してサーバーにPOSTリクエストを送信
+        const response = await fetch('/get_message', {
+            method: 'POST',             // HTTPメソッドをPOSTに設定
+            headers: {
+                'Content-Type': 'application/json'  // コンテンツタイプをJSONに設定
+            },
+            body: JSON.stringify(data)  // JavaScriptオブジェクトをJSON文字列に変換
+        });
+
+        // レスポンスをJSONとしてパース
+        const responseData = await response.json();
+        // console.log('Server response:', responseData);
+        
+        // サーバーからのレスポンスメッセージを関数の戻り値として返す
+        return responseData;
+    } catch (error) {
+        // エラーが発生した場合、エラーメッセージをコンソールに出力
+        console.error('Error:', error);
+        return null; // エラーが発生した場合はnullを返す
+    }
 }
