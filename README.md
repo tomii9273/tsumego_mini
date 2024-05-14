@@ -1,6 +1,6 @@
 # tsumego_mini
 
-小路盤での囲碁ゲームの Web アプリです。  
+小路盤での囲碁パズルゲームの Web アプリです。  
 https://tsumego-mini-239f0748ace2.herokuapp.com/
 
 ## 仮想環境について (暫定・自分用)
