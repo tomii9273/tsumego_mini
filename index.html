@@ -37,7 +37,7 @@
         background-color: #f00;
       }
       #history {
-        width: 450px;
+        width: 350px; /* 最長のメッセージ (コウの注意) がちょうど 1 行に入るくらい */
         height: 150px;
         border: 1px solid #000;
         overflow-y: auto; /* 履歴が多くなった場合にスクロール */
@@ -60,7 +60,7 @@
     <div id="board" class="board">
       <!-- JavaScriptで碁盤を生成 -->
     </div>
-    <div id="history">Move History:</div>
+    <div id="history">ログ:</div>
     <button id="pass">pass</button>
     <h3>ルール</h3>
     <ul>
