@@ -69,7 +69,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     const passButton = document.getElementById('pass'); // passボタンを取得
 
     let scorexy = await placeStone(str_board);
-    boardNumDiv.innerHTML += String(board_num) + " " + str_board + " " + scorexy["score"];
+    boardNumDiv.innerHTML = "No." + String(board_num) + "  最大得点:" + scorexy["score"];
+    console.log("No." + String(board_num) + " 最大得点:" + scorexy["score"] + " str_board:" + str_board + " 黒の最善手:(" + scorexy["x"] + ", " + scorexy["y"] + ")");
 
     // // 盤面の反映
     // for (let ii = 0; ii < size*size; ii++) {
