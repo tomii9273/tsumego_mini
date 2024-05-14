@@ -42,6 +42,11 @@
         border: 1px solid #000;
         overflow-y: auto; /* 履歴が多くなった場合にスクロール */
       }
+      #pass {
+        width: 150px;
+        height: 50px;
+        font-size: 20px;
+      }
     </style>
   </head>
   <body>
@@ -60,8 +65,8 @@
     <div id="board" class="board">
       <!-- JavaScriptで碁盤を生成 -->
     </div>
+    <button id="pass">パス</button>
     <div id="history">ログ:</div>
-    <button id="pass">pass</button>
     <h3>ルール</h3>
     <ul>
       <li>黒と白のターンが交互に来ます。あなたは<b>黒で先手</b>です。</li>
