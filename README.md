@@ -8,7 +8,7 @@ https://tsumego-mini-239f0748ace2.herokuapp.com/
 - 本番環境用: `requirements.txt`
   - このファイルは Heroku でデプロイ時に使われます。
 - 開発環境 (`.venv`) 用: `requirements_dev.txt`
-  - venv を使用している。本番環境のライブラリに加えて、分析用のものや linter, formatter が含まれます。
+  - 本番環境のライブラリに加えて、分析用のものや linter, formatter が含まれます。
 
 ## プルリクエストについて
 
