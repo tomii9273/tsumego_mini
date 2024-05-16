@@ -2,7 +2,7 @@
 <html lang="ja">
   <head>
     <meta charset="UTF-8" />
-    <title>3路盤 詰碁ゲーム</title>
+    <title>3路盤 囲碁パズル</title>
     <style>
       .board {
         background-image: url("goban.png"); /* 碁盤画像 */
@@ -37,31 +37,90 @@
         background-color: #f00;
       }
       #history {
-        width: 450px;
+        width: 350px; /* 最長のメッセージ (コウの注意) がちょうど 1 行に入るくらい */
         height: 150px;
         border: 1px solid #000;
         overflow-y: auto; /* 履歴が多くなった場合にスクロール */
       }
+      #pass {
+        width: 150px;
+        height: 50px;
+        font-size: 20px;
+      }
     </style>
   </head>
   <body>
-    <h2>3路盤 詰碁ゲーム</h2>
+    <h2>3路盤 囲碁パズル</h2>
     <div id="boardNumForm">
       <input
         type="number"
         id="boardNum"
         min="0"
         max="5025"
-        placeholder="Board Number (0-5025)"
+        placeholder="盤面番号"
       />
-      <button onclick="initBoard()">決定</button>
+      <button onclick="initBoard()">作成</button>
     </div>
-    <div id="board_num_str">board:</div>
+    <div id="board_num_str"></div>
     <div id="board" class="board">
       <!-- JavaScriptで碁盤を生成 -->
     </div>
-    <div id="history">Move History:</div>
-    <button id="pass">pass</button>
+    <button id="pass">パス</button>
+    <div id="history">ログ:</div>
+    <h3>ルール</h3>
+    <ul>
+      <li>黒と白のターンが交互に来ます。あなたは<b>黒で先手</b>です。</li>
+      <li>
+        自分のターンでは、空いている点に<b>石を置く</b>か<b>パスをする</b>ことができます。
+        <ul>
+          <li>置いた石で相手の石を囲んだら、相手の石を取ります。</li>
+          <li>
+            相手の石に囲まれるような場所に置いたら、その瞬間取られてしまいます。
+          </li>
+        </ul>
+      </li>
+      <li>
+        <b>双方が続けてパス</b>をしたら、ゲームが終了します。<b
+          >盤上の (自分の石数) − (相手の石数) </b
+        >が得点になります。
+      </li>
+      <li>
+        どちらかが石を<b>累計 8 個以上取った場合</b
+        >にも、ゲームが終了します。取った側は 10 点、取られた側は −10
+        点が得点になります。
+      </li>
+      <li>
+        盤面 (石の初期配置のパターン) は 0 番から 5025
+        番まであります。「最大得点」は最善手をとった場合の黒の得点です。
+      </li>
+    </ul>
+    <details>
+      <summary>詳細ルール</summary>
+      <ul>
+        <li>
+          置いた瞬間、相手の石を囲み、かつ自分の石が囲まれた場合、相手の石を取ります。自分の石は取られません。
+        </li>
+        <li>
+          いわゆる<b>「コウのルール」があります</b>。石を置いた結果「相手が直前の石を置く前の盤面」になるような場所には置くことができません。置けない場所は赤色の丸で表示されます。
+        </li>
+        <li>
+          白は常に最善手をとります。最善手は「相手が今後の各局面で最善手をとると想定した際に、最も自分の最終的な得点が高くなるような手」と再帰的に定義します。
+        </li>
+        <li>
+          いわゆる「着手禁止点」はありません。置けますが、その瞬間に取られます。
+        </li>
+        <li>
+          いわゆる「スーパーコウのルール」はありません。石を 8
+          個以上取った際にゲームが終了するため、無限反復にはなりません。
+        </li>
+        <li>
+          仕様上、互いにパスすれば終わる局面でも、白が無意味な手を打ち続ける場合
+          (すぐ取られる場所に打つなど) があります。
+        </li>
+      </ul>
+    </details>
     <script src="app.js"></script>
+    <p>初回公開: 2024-05-07</p>
+    <p>作成者: <a href="https://x.com/Tomii9273">@Tomii9273</a></p>
   </body>
 </html>
