@@ -2,10 +2,6 @@ const size = 3;
 const N = size;
 const n_board = 5026;
 
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
 const DI = [
   [0, 1], // 右
   [1, 0], // 下
@@ -181,7 +177,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         // 相手の番
         if (!isLocked) {
           let scorexy = await placeStone(str_board);
-          let score = scorexy["score"];
           row = scorexy["x"];
           col = scorexy["y"];
 
@@ -327,7 +322,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (!isLocked) {
       let taken_stones = 0;
       let scorexy = await placeStone(str_board);
-      let score = scorexy["score"];
       let row = scorexy["x"];
       let col = scorexy["y"];
       let j = row * size + col;
