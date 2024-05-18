@@ -21,6 +21,7 @@ def static_file(path):
 
 @app.route("/get_message", methods=["POST"])
 def get_message():
+    """盤面文字列 (15 桁) から最善手・そのときの最大スコアを取得"""
     data = request.json
     board = data["board"]
     conn = psycopg2.connect(DATABASE_URL, sslmode="require")
@@ -37,6 +38,7 @@ def get_message():
 
 @app.route("/get_board_str", methods=["POST"])
 def get_board_str():
+    """盤面番号から盤面文字列 (9 桁) を取得"""
     data = request.json
     num = data["num"]
     conn = psycopg2.connect(DATABASE_URL, sslmode="require")
