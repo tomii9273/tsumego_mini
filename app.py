@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 import os
 
 load_dotenv()  # 環境変数をロード
-DATABASE_URL = database_url = os.getenv("DATABASE_URL")
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 app = Flask(__name__, static_folder=".")
 
