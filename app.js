@@ -7,17 +7,17 @@ function sleep(ms) {
 }
 
 const DI = [
-  [0, 1], // 右へ移動
-  [1, 0], // 下へ移動
-  [0, -1], // 左へ移動
-  [-1, 0], // 上へ移動
+  [0, 1], // 右
+  [1, 0], // 下
+  [0, -1], // 左
+  [-1, 0], // 上
 ];
 
 var board_num = 0;
 var str_board = "";
 var hama_sente = 0;
 var hama_gote = 0;
-var isLocked = false; // ロック状態の管理
+var isLocked = false; // 勝負がついたらロックして石を置けないようにする
 
 async function initBoard() {
   board_num = document.getElementById("boardNum").value; // 0-indexed
@@ -30,25 +30,21 @@ async function initBoard() {
     const cell = document.createElement("div");
     cell.className = "cell";
     cell.style.position = "relative";
-    // board.appendChild(cell);
     const nextCell = board.children[i];
 
     if (nextCell.firstChild) {
       // このセルに石がすでに置かれている場合
       nextCell.removeChild(nextCell.firstChild); // 石を除去
-      // historyDiv.innerHTML += `<br>除去: ${ii} `;
     }
     if (str_board.charAt(i) == "1") {
       const stone = document.createElement("div");
       stone.className = "stone black";
       nextCell.appendChild(stone);
-      // historyDiv.innerHTML += `<br>黒石: ${ii} `;
     }
     if (str_board.charAt(i) == "2") {
       const stone = document.createElement("div");
       stone.className = "stone white";
       nextCell.appendChild(stone);
-      // historyDiv.innerHTML += `<br>白石: ${ii} `;
     }
     if (str_board.charAt(i) == "3") {
       const stone = document.createElement("div");
@@ -59,13 +55,12 @@ async function initBoard() {
 }
 
 document.addEventListener("DOMContentLoaded", async function () {
-  // alert('DOMContentLoaded');
   board_num = Math.floor(Math.random() * n_board);
   str_board = (await getBoardStr(board_num))["board_str"] + "100000";
-  const board = document.getElementById("board");
-  const historyDiv = document.getElementById("history"); // 履歴表示用のdiv
-  const boardNumDiv = document.getElementById("board_num_str"); // 履歴表示用のdiv
-  const passButton = document.getElementById("pass"); // passボタンを取得
+  const board = document.getElementById("board"); // 盤面表示用
+  const historyDiv = document.getElementById("history"); // 履歴表示用
+  const boardNumDiv = document.getElementById("board_num_str"); // 盤面番号・最大得点の表示用
+  const passButton = document.getElementById("pass"); // passボタン
 
   let scorexy = await placeStone(str_board);
   boardNumDiv.innerHTML =
@@ -84,33 +79,6 @@ document.addEventListener("DOMContentLoaded", async function () {
       ")"
   );
 
-  // // 盤面の反映
-  // for (let ii = 0; ii < size*size; ii++) {
-  //     board.appendChild(cell);
-  //     const nextCell = board.children[ii];
-  //     // if (nextCell.firstChild) { // このセルに石がすでに置かれている場合
-  //     //     nextCell.removeChild(nextCell.firstChild); // 石を除去
-  //     //     // historyDiv.innerHTML += `<br>除去: ${ii} `;
-  //     // }
-  //     if (str_board.charAt(ii) == "1") {
-  //         const stone = document.createElement('div');
-  //         stone.className = 'stone black';
-  //         nextCell.appendChild(stone);
-  //         // historyDiv.innerHTML += `<br>黒石: ${ii} `;
-  //     }
-  //     if (str_board.charAt(ii) == "2") {
-  //         const stone = document.createElement('div');
-  //         stone.className = 'stone white';
-  //         nextCell.appendChild(stone);
-  //         // historyDiv.innerHTML += `<br>白石: ${ii} `;
-  //     }
-  //     if (str_board.charAt(ii) == "3") {
-  //         const stone = document.createElement('div');
-  //         stone.className = 'stone red';
-  //         nextCell.appendChild(stone);
-  //     }
-  // }
-
   for (let i = 0; i < size * size; i++) {
     const cell = document.createElement("div");
     cell.className = "cell";
@@ -122,13 +90,11 @@ document.addEventListener("DOMContentLoaded", async function () {
       const stone = document.createElement("div");
       stone.className = "stone black";
       nextCell.appendChild(stone);
-      // historyDiv.innerHTML += `<br>黒石: ${ii} `;
     }
     if (str_board.charAt(i) == "2") {
       const stone = document.createElement("div");
       stone.className = "stone white";
       nextCell.appendChild(stone);
-      // historyDiv.innerHTML += `<br>白石: ${ii} `;
     }
     if (str_board.charAt(i) == "3") {
       const stone = document.createElement("div");
@@ -140,9 +106,6 @@ document.addEventListener("DOMContentLoaded", async function () {
       if (isLocked) return;
       if (!this.firstChild) {
         // すでに石が置かれていないことを確認
-        // const stone = document.createElement('div');
-        // stone.className = 'stone black';
-        // this.appendChild(stone);
         let row = Math.floor(i / size);
         let col = i % size;
         historyDiv.innerHTML += `<br>黒石を置いた: (${row + 1}, ${col + 1})`;
@@ -155,9 +118,6 @@ document.addEventListener("DOMContentLoaded", async function () {
             0 <= col + dcol &&
             col + dcol < N
           ) {
-            // alert(str_board.charAt((row + drow) * N + col + dcol));
-            // alert(str_board.charAt(i));
-
             if (
               str_board.charAt((row + drow) * N + col + dcol) !=
               str_board.charAt(i)
@@ -200,9 +160,6 @@ document.addEventListener("DOMContentLoaded", async function () {
             "3" +
             str_board.substr(kou_row * size + kou_col + 1);
         }
-
-        // historyDiv.innerHTML += `<br>str: ${str_board.substr(0, size*size + 2)}`;
-        // historyDiv.innerHTML += `<br>hama: ${String(hama_sente).padStart(2, '0')} ${String(hama_gote).padStart(2, '0')}`;
         str_board =
           str_board.substr(0, size * size) +
           "00" +
@@ -211,9 +168,6 @@ document.addEventListener("DOMContentLoaded", async function () {
           str_board.substr(0, size * size + 2) +
           String(hama_sente).padStart(2, "0") +
           String(hama_gote).padStart(2, "0");
-        // alert(str_board);
-        // alert(globalData[str_board])
-        // historyDiv.innerHTML += `<br>str_board: ${str_board} `;
 
         // 終局判定 (アゲハマ 8 個以上)
         if (hama_sente >= 8) {
@@ -232,10 +186,6 @@ document.addEventListener("DOMContentLoaded", async function () {
           col = scorexy["y"];
 
           let j = row * size + col;
-          // const nextCell = board.children[j];
-          // const nextStone = document.createElement('div');
-          // nextStone.className = 'stone white';
-          // nextCell.appendChild(nextStone);
           if (row == -1) {
             historyDiv.innerHTML += "<br>白はパスをした";
 
@@ -262,9 +212,6 @@ document.addEventListener("DOMContentLoaded", async function () {
                 0 <= col + dcol &&
                 col + dcol < N
               ) {
-                // alert(str_board.charAt((row + drow) * N + col + dcol));
-                // alert(str_board.charAt(i));
-
                 if (
                   str_board.charAt((row + drow) * N + col + dcol) !=
                   str_board.charAt(j)
@@ -318,13 +265,11 @@ document.addEventListener("DOMContentLoaded", async function () {
               str_board.substr(0, size * size) +
               "10" +
               str_board.substr(size * size + 2);
-            // historyDiv.innerHTML += `<br>hama: ${String(hama_sente).padStart(2, '0')} ${String(hama_gote).padStart(2, '0')}`;
             str_board =
               str_board.substr(0, size * size + 2) +
               String(hama_sente).padStart(2, "0") +
               String(hama_gote).padStart(2, "0");
           }
-          // historyDiv.innerHTML += `<br>str_board: ${str_board} `;
 
           // 終局判定 (アゲハマ 8 個以上)
           if (hama_sente >= 8) {
@@ -336,29 +281,22 @@ document.addEventListener("DOMContentLoaded", async function () {
           }
         }
 
-        // if (!isLocked) {
-        //     historyDiv.innerHTML += `<br>次の正着は(${globalData[str_board][1]},${globalData[str_board][2]})です(${globalData[str_board][0]}点勝ち)`;
-        // }
-
         // 盤面の反映
         for (let ii = 0; ii < size * size; ii++) {
           const nextCell = board.children[ii];
           if (nextCell.firstChild) {
             // このセルに石がすでに置かれている場合
             nextCell.removeChild(nextCell.firstChild); // 石を除去
-            // historyDiv.innerHTML += `<br>除去: ${ii} `;
           }
           if (str_board.charAt(ii) == "1") {
             const stone = document.createElement("div");
             stone.className = "stone black";
             nextCell.appendChild(stone);
-            // historyDiv.innerHTML += `<br>黒石: ${ii} `;
           }
           if (str_board.charAt(ii) == "2") {
             const stone = document.createElement("div");
             stone.className = "stone white";
             nextCell.appendChild(stone);
-            // historyDiv.innerHTML += `<br>白石: ${ii} `;
           }
           if (str_board.charAt(ii) == "3") {
             const stone = document.createElement("div");
@@ -371,7 +309,6 @@ document.addEventListener("DOMContentLoaded", async function () {
   }
 
   passButton.addEventListener("click", async function () {
-    // historyDiv.innerHTML += "<br>パスボタンを押した";
     if (isLocked) return;
     historyDiv.innerHTML += "<br>黒はパスをした";
 
@@ -385,21 +322,16 @@ document.addEventListener("DOMContentLoaded", async function () {
       str_board.substr(0, size * size) +
       "01" +
       str_board.substr(size * size + 2);
-    // historyDiv.innerHTML += `<br>str_board: ${str_board} `;
 
     // 相手の番
     if (!isLocked) {
       let taken_stones = 0;
-      // [score, row, col] = globalData[str_board];
       let scorexy = await placeStone(str_board);
       let score = scorexy["score"];
       let row = scorexy["x"];
       let col = scorexy["y"];
       let j = row * size + col;
-      // const nextCell = board.children[j];
-      // const nextStone = document.createElement('div');
-      // nextStone.className = 'stone white';
-      // nextCell.appendChild(nextStone);
+
       if (row == -1) {
         historyDiv.innerHTML += "<br>白はパスをした";
 
@@ -424,9 +356,6 @@ document.addEventListener("DOMContentLoaded", async function () {
             0 <= col + dcol &&
             col + dcol < N
           ) {
-            // alert(str_board.charAt((row + drow) * N + col + dcol));
-            // alert(str_board.charAt(i));
-
             if (
               str_board.charAt((row + drow) * N + col + dcol) !=
               str_board.charAt(j)
@@ -474,13 +403,11 @@ document.addEventListener("DOMContentLoaded", async function () {
           str_board.substr(0, size * size) +
           "10" +
           str_board.substr(size * size + 2);
-        // historyDiv.innerHTML += `<br>hama: ${String(hama_sente).padStart(2, '0')} ${String(hama_gote).padStart(2, '0')}`;
         str_board =
           str_board.substr(0, size * size + 2) +
           String(hama_sente).padStart(2, "0") +
           String(hama_gote).padStart(2, "0");
       }
-      // historyDiv.innerHTML += `<br>str_board: ${str_board} `;
 
       // 終局判定 (アゲハマ 8 個以上)
       if (hama_sente >= 8) {
@@ -492,29 +419,22 @@ document.addEventListener("DOMContentLoaded", async function () {
       }
     }
 
-    // if (!isLocked) {
-    //     historyDiv.innerHTML += `<br>次の正着は(${globalData[str_board][1]},${globalData[str_board][2]})です(${globalData[str_board][0]}点勝ち)`;
-    // }
-
     // 盤面の反映
     for (let ii = 0; ii < size * size; ii++) {
       const nextCell = board.children[ii];
       if (nextCell.firstChild) {
         // このセルに石がすでに置かれている場合
         nextCell.removeChild(nextCell.firstChild); // 石を除去
-        // historyDiv.innerHTML += `<br>除去: ${ii} `;
       }
       if (str_board.charAt(ii) == "1") {
         const stone = document.createElement("div");
         stone.className = "stone black";
         nextCell.appendChild(stone);
-        // historyDiv.innerHTML += `<br>黒石: ${ii} `;
       }
       if (str_board.charAt(ii) == "2") {
         const stone = document.createElement("div");
         stone.className = "stone white";
         nextCell.appendChild(stone);
-        // historyDiv.innerHTML += `<br>白石: ${ii} `;
       }
       if (str_board.charAt(ii) == "3") {
         const stone = document.createElement("div");
@@ -559,23 +479,8 @@ function checkKou(str_board, row, col, n_taken_stone_sum, my_stone_col) {
   return [-1, -1];
 }
 
-// # コウで打てない場所の処理
-// # 今打った手で石を 1 つだけ取っており、かつ今打った手の 3 方が (相手の石で埋まっている or 盤外) の場合、
-// # 次に相手はその抜き跡に打つことができない
-// if n_taken_stone_sum == 1:
-//     ng_place = (-1, -1)
-//     cnt = 0
-//     for di, dj in DI:
-//         if 0 <= i + di < N and 0 <= j + dj < N and board[i + di][j + dj] == 1 + int(state.turn):
-//             cnt += 1
-//         elif not (0 <= i + di < N and 0 <= j + dj < N):
-//             cnt += 1
-//         else:
-//             ng_place = (i + di, j + dj)
-//     if cnt == 3:
-//         board[ng_place[0]][ng_place[1]] = 3
-
 function countStone(str_board) {
+  // 盤面文字列 (9 桁または 15 桁) から、盤上の石の数をカウントして勝敗を判定
   output = "";
   let n_black = (str_board.substr(0, size * size).match(/1/g) || []).length;
   let n_white = (str_board.substr(0, size * size).match(/2/g) || []).length;
@@ -647,55 +552,49 @@ function takeStone(pi, pj, board_str) {
 }
 
 async function placeStone(board) {
-  // サーバーに送るデータを準備
+  // 盤面文字列 (15 桁) から最善手・そのときの最大スコアを取得
   const data = { board: board };
 
   try {
     // fetch APIを使用してサーバーにPOSTリクエストを送信
     const response = await fetch("/get_message", {
-      method: "POST", // HTTPメソッドをPOSTに設定
+      method: "POST",
       headers: {
-        "Content-Type": "application/json", // コンテンツタイプをJSONに設定
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(data), // JavaScriptオブジェクトをJSON文字列に変換
     });
 
     // レスポンスをJSONとしてパース
     const responseData = await response.json();
-    // console.log('Server response:', responseData);
 
-    // サーバーからのレスポンスメッセージを関数の戻り値として返す
     return responseData;
   } catch (error) {
-    // エラーが発生した場合、エラーメッセージをコンソールに出力
     console.error("Error:", error);
-    return null; // エラーが発生した場合はnullを返す
+    return null;
   }
 }
 
 async function getBoardStr(num) {
-  // サーバーに送るデータを準備
+  // 盤面番号から盤面文字列 (9 桁) を取得
   const data = { num: num };
 
   try {
     // fetch APIを使用してサーバーにPOSTリクエストを送信
     const response = await fetch("/get_board_str", {
-      method: "POST", // HTTPメソッドをPOSTに設定
+      method: "POST",
       headers: {
-        "Content-Type": "application/json", // コンテンツタイプをJSONに設定
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(data), // JavaScriptオブジェクトをJSON文字列に変換
     });
 
     // レスポンスをJSONとしてパース
     const responseData = await response.json();
-    // console.log('Server response:', responseData);
 
-    // サーバーからのレスポンスメッセージを関数の戻り値として返す
     return responseData;
   } catch (error) {
-    // エラーが発生した場合、エラーメッセージをコンソールに出力
     console.error("Error:", error);
-    return null; // エラーが発生した場合はnullを返す
+    return null;
   }
 }
