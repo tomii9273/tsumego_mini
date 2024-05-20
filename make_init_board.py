@@ -1,6 +1,7 @@
-from main import take_stone, N
 import json
 import time
+
+from main import N, take_stone
 
 time_start = time.time()
 

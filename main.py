@@ -1,6 +1,6 @@
 import json
-import time
 import sys
+import time
 from dataclasses import dataclass
 
 sys.setrecursionlimit(10**6)
