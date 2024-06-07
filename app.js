@@ -59,8 +59,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   const passButton = document.getElementById("pass"); // passボタン
 
   let scorexy = await placeStone(str_board);
-  boardNumDiv.innerHTML =
-    "No." + String(board_num) + " 最大得点:" + scorexy["score"];
+  boardNumDiv.innerHTML = "No." + String(board_num) + " 最大得点:" + scorexy["score"];
   console.log(
     "No." +
       String(board_num) +
@@ -108,21 +107,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         str_board = str_board.substr(0, i) + "1" + str_board.substr(i + 1);
         let taken_stones = 0;
         for (let [drow, dcol] of DI) {
-          if (
-            0 <= row + drow &&
-            row + drow < N &&
-            0 <= col + dcol &&
-            col + dcol < N
-          ) {
-            if (
-              str_board.charAt((row + drow) * N + col + dcol) !=
-              str_board.charAt(i)
-            ) {
-              let [str_b, n_stone] = takeStone(
-                row + drow,
-                col + dcol,
-                str_board
-              );
+          if (0 <= row + drow && row + drow < N && 0 <= col + dcol && col + dcol < N) {
+            if (str_board.charAt((row + drow) * N + col + dcol) != str_board.charAt(i)) {
+              let [str_b, n_stone] = takeStone(row + drow, col + dcol, str_board);
               str_board = str_b;
               taken_stones += n_stone;
             }
@@ -142,24 +129,16 @@ document.addEventListener("DOMContentLoaded", async function () {
         // コウの処理
         for (let ii = 0; ii < size * size; ii++) {
           if (str_board.charAt(ii) == "3") {
-            str_board =
-              str_board.substr(0, ii) + "0" + str_board.substr(ii + 1);
+            str_board = str_board.substr(0, ii) + "0" + str_board.substr(ii + 1);
           }
         }
         let [kou_row, kou_col] = checkKou(str_board, row, col, taken_stones, 1);
         if (kou_row != -1) {
-          historyDiv.innerHTML += `<br>コウのためこの座標には打てません: (${
-            kou_row + 1
-          }, ${kou_col + 1})`;
+          historyDiv.innerHTML += `<br>コウのためこの座標には打てません: (${kou_row + 1}, ${kou_col + 1})`;
           str_board =
-            str_board.substr(0, kou_row * size + kou_col) +
-            "3" +
-            str_board.substr(kou_row * size + kou_col + 1);
+            str_board.substr(0, kou_row * size + kou_col) + "3" + str_board.substr(kou_row * size + kou_col + 1);
         }
-        str_board =
-          str_board.substr(0, size * size) +
-          "00" +
-          str_board.substr(size * size + 2);
+        str_board = str_board.substr(0, size * size) + "00" + str_board.substr(size * size + 2);
         str_board =
           str_board.substr(0, size * size + 2) +
           String(hama_sente).padStart(2, "0") +
@@ -190,32 +169,15 @@ document.addEventListener("DOMContentLoaded", async function () {
               isLocked = true;
             }
 
-            str_board =
-              str_board.substr(0, size * size) +
-              "11" +
-              str_board.substr(size * size + 2);
+            str_board = str_board.substr(0, size * size) + "11" + str_board.substr(size * size + 2);
           } else {
-            historyDiv.innerHTML += `<br>白石を置いた: (${row + 1}, ${
-              col + 1
-            })`;
+            historyDiv.innerHTML += `<br>白石を置いた: (${row + 1}, ${col + 1})`;
             str_board = str_board.substr(0, j) + "2" + str_board.substr(j + 1);
             taken_stones = 0;
             for (let [drow, dcol] of DI) {
-              if (
-                0 <= row + drow &&
-                row + drow < N &&
-                0 <= col + dcol &&
-                col + dcol < N
-              ) {
-                if (
-                  str_board.charAt((row + drow) * N + col + dcol) !=
-                  str_board.charAt(j)
-                ) {
-                  let [str_b, n_stone] = takeStone(
-                    row + drow,
-                    col + dcol,
-                    str_board
-                  );
+              if (0 <= row + drow && row + drow < N && 0 <= col + dcol && col + dcol < N) {
+                if (str_board.charAt((row + drow) * N + col + dcol) != str_board.charAt(j)) {
+                  let [str_b, n_stone] = takeStone(row + drow, col + dcol, str_board);
                   str_board = str_b;
                   taken_stones += n_stone;
                 }
@@ -235,31 +197,17 @@ document.addEventListener("DOMContentLoaded", async function () {
             // コウの処理
             for (let ii = 0; ii < size * size; ii++) {
               if (str_board.charAt(ii) == "3") {
-                str_board =
-                  str_board.substr(0, ii) + "0" + str_board.substr(ii + 1);
+                str_board = str_board.substr(0, ii) + "0" + str_board.substr(ii + 1);
               }
             }
-            let [kou_row, kou_col] = checkKou(
-              str_board,
-              row,
-              col,
-              taken_stones,
-              2
-            );
+            let [kou_row, kou_col] = checkKou(str_board, row, col, taken_stones, 2);
             if (kou_row != -1) {
-              historyDiv.innerHTML += `<br>コウのためこの座標には打てません: (${
-                kou_row + 1
-              }, ${kou_col + 1})`;
+              historyDiv.innerHTML += `<br>コウのためこの座標には打てません: (${kou_row + 1}, ${kou_col + 1})`;
               str_board =
-                str_board.substr(0, kou_row * size + kou_col) +
-                "3" +
-                str_board.substr(kou_row * size + kou_col + 1);
+                str_board.substr(0, kou_row * size + kou_col) + "3" + str_board.substr(kou_row * size + kou_col + 1);
             }
 
-            str_board =
-              str_board.substr(0, size * size) +
-              "10" +
-              str_board.substr(size * size + 2);
+            str_board = str_board.substr(0, size * size) + "10" + str_board.substr(size * size + 2);
             str_board =
               str_board.substr(0, size * size + 2) +
               String(hama_sente).padStart(2, "0") +
@@ -313,10 +261,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       isLocked = true;
     }
 
-    str_board =
-      str_board.substr(0, size * size) +
-      "01" +
-      str_board.substr(size * size + 2);
+    str_board = str_board.substr(0, size * size) + "01" + str_board.substr(size * size + 2);
 
     // 相手の番
     if (!isLocked) {
@@ -335,30 +280,15 @@ document.addEventListener("DOMContentLoaded", async function () {
           isLocked = true;
         }
 
-        str_board =
-          str_board.substr(0, size * size) +
-          "11" +
-          str_board.substr(size * size + 2);
+        str_board = str_board.substr(0, size * size) + "11" + str_board.substr(size * size + 2);
       } else {
         historyDiv.innerHTML += `<br>白石を置いた: (${row + 1}, ${col + 1})`;
         str_board = str_board.substr(0, j) + "2" + str_board.substr(j + 1);
         taken_stones = 0;
         for (let [drow, dcol] of DI) {
-          if (
-            0 <= row + drow &&
-            row + drow < N &&
-            0 <= col + dcol &&
-            col + dcol < N
-          ) {
-            if (
-              str_board.charAt((row + drow) * N + col + dcol) !=
-              str_board.charAt(j)
-            ) {
-              let [str_b, n_stone] = takeStone(
-                row + drow,
-                col + dcol,
-                str_board
-              );
+          if (0 <= row + drow && row + drow < N && 0 <= col + dcol && col + dcol < N) {
+            if (str_board.charAt((row + drow) * N + col + dcol) != str_board.charAt(j)) {
+              let [str_b, n_stone] = takeStone(row + drow, col + dcol, str_board);
               str_board = str_b;
               taken_stones += n_stone;
             }
@@ -378,25 +308,17 @@ document.addEventListener("DOMContentLoaded", async function () {
         // コウの処理
         for (let ii = 0; ii < size * size; ii++) {
           if (str_board.charAt(ii) == "3") {
-            str_board =
-              str_board.substr(0, ii) + "0" + str_board.substr(ii + 1);
+            str_board = str_board.substr(0, ii) + "0" + str_board.substr(ii + 1);
           }
         }
         let [kou_row, kou_col] = checkKou(str_board, row, col, taken_stones, 2);
         if (kou_row != -1) {
-          historyDiv.innerHTML += `<br>コウのためこの座標には打てません: (${
-            kou_row + 1
-          }, ${kou_col + 1})`;
+          historyDiv.innerHTML += `<br>コウのためこの座標には打てません: (${kou_row + 1}, ${kou_col + 1})`;
           str_board =
-            str_board.substr(0, kou_row * size + kou_col) +
-            "3" +
-            str_board.substr(kou_row * size + kou_col + 1);
+            str_board.substr(0, kou_row * size + kou_col) + "3" + str_board.substr(kou_row * size + kou_col + 1);
         }
 
-        str_board =
-          str_board.substr(0, size * size) +
-          "10" +
-          str_board.substr(size * size + 2);
+        str_board = str_board.substr(0, size * size) + "10" + str_board.substr(size * size + 2);
         str_board =
           str_board.substr(0, size * size + 2) +
           String(hama_sente).padStart(2, "0") +
@@ -454,14 +376,7 @@ function checkKou(str_board, row, col, n_taken_stone_sum, my_stone_col) {
       str_board.charAt((row + drow) * size + col + dcol) == 3 - my_stone_col
     ) {
       cnt += 1;
-    } else if (
-      !(
-        0 <= row + drow &&
-        row + drow < size &&
-        0 <= col + dcol &&
-        col + dcol < size
-      )
-    ) {
+    } else if (!(0 <= row + drow && row + drow < size && 0 <= col + dcol && col + dcol < size)) {
       cnt += 1;
     } else {
       ng_place = [row + drow, col + dcol];

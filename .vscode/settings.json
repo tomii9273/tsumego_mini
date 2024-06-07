@@ -17,5 +17,6 @@
       "source.organizeImports": "explicit"
     }
   },
-  "black-formatter.args": ["--line-length", "119"]
+  "black-formatter.args": ["--line-length", "119"],
+  "prettier.printWidth": 200
 }
