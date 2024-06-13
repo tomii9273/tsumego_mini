@@ -18,5 +18,5 @@
     }
   },
   "black-formatter.args": ["--line-length", "119"],
-  "prettier.printWidth": 200
+  "prettier.printWidth": 120
 }
