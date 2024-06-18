@@ -1,10 +1,11 @@
-from flask import Flask, send_from_directory, request, jsonify
-import psycopg2
-from dotenv import load_dotenv
 import os
 
+import psycopg2
+from dotenv import load_dotenv
+from flask import Flask, jsonify, request, send_from_directory
+
 load_dotenv()  # 環境変数をロード
-DATABASE_URL = database_url = os.getenv("DATABASE_URL")
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 app = Flask(__name__, static_folder=".")
 
@@ -21,6 +22,7 @@ def static_file(path):
 
 @app.route("/get_message", methods=["POST"])
 def get_message():
+    """盤面文字列 (15 桁) から最善手・そのときの最大スコアを取得"""
     data = request.json
     board = data["board"]
     conn = psycopg2.connect(DATABASE_URL, sslmode="require")
@@ -37,6 +39,7 @@ def get_message():
 
 @app.route("/get_board_str", methods=["POST"])
 def get_board_str():
+    """盤面番号から盤面文字列 (9 桁) を取得"""
     data = request.json
     num = data["num"]
     conn = psycopg2.connect(DATABASE_URL, sslmode="require")

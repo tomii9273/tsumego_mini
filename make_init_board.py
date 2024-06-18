@@ -1,6 +1,9 @@
-from main import take_stone, N
+# N x N の盤面を全探索する。囲まれている石がないものを、回転・反転の重複を除いた状態で番号を付けて init_boards.json に保存する。
+
 import json
 import time
+
+from main import N, take_stone
 
 time_start = time.time()
 
