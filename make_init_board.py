@@ -1,3 +1,5 @@
+# N x N の盤面を全探索する。囲まれている石がないものを、回転・反転の重複を除いた状態で番号を付けて init_boards.json に保存する。
+
 import json
 import time
 

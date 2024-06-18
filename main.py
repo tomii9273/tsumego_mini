@@ -1,3 +1,5 @@
+# init_boards.json の各盤面について、アゲハマ0・先手番の状態から遷移できる状態と最善手を全探索し、data_{N}.json として保存
+
 import json
 import sys
 import time

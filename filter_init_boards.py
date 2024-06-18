@@ -1,3 +1,7 @@
+# init_boards.json から特定の条件を満たす盤面を抽出して filtered_init_boards.json に保存する。
+# ゲームとして面白くない盤面を除くのが目的。
+# 条件に最善得点などを使う場合、一度 main.py を実行して data_3.json を作る必要がある。
+
 import json
 
 init_boards = json.load(open("init_boards.json", "r"))
