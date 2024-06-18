@@ -16,6 +16,7 @@ var hama_gote = 0;
 var isLocked = false; // 勝負がついたらロックして石を置けないようにする
 
 async function initBoard() {
+  // 盤面の初期化。TODO: 重複コードのリファクタ、初期化後の盤面番号と最大得点を表示する
   board_num = document.getElementById("boardNum").value; // 0-indexed
   str_board = (await getBoardStr(board_num))["board_str"] + "100000";
   isLocked = false;

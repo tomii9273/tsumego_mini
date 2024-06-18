@@ -206,6 +206,7 @@ def take_stone(pi: int, pj: int, board: list[list[int]]) -> tuple[list[list[int]
 
 
 def str_to_board(board_str: str) -> tuple[tuple[int]]:
+    """盤面文字列 (N*N 文字) をタプルに変換"""
     board = [[0] * N for _ in range(N)]
     for i in range(N2):
         board[i // N][i % N] = int(board_str[i])
