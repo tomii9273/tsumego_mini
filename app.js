@@ -15,20 +15,10 @@ var hama_sente = 0;
 var hama_gote = 0;
 var isLocked = false; // 勝負がついたらロックして石を置けないようにする
 
-async function initBoard() {
-  // 盤面の初期化。TODO: 重複コードのリファクタ、初期化後の盤面番号と最大得点を表示する
-  board_num = document.getElementById("boardNum").value; // 0-indexed
-  str_board = (await getBoardStr(board_num))["board_str"] + "100000";
-  isLocked = false;
-  hama_sente = 0;
-  hama_gote = 0;
-
+function strToBoard(str_board, board) {
+  // 盤面文字列 (9 桁) から盤面を生成
   for (let i = 0; i < size * size; i++) {
-    const cell = document.createElement("div");
-    cell.className = "cell";
-    cell.style.position = "relative";
     const nextCell = board.children[i];
-
     if (nextCell.firstChild) {
       // このセルに石がすでに置かれている場合
       nextCell.removeChild(nextCell.firstChild); // 石を除去
@@ -49,12 +39,23 @@ async function initBoard() {
       nextCell.appendChild(stone);
     }
   }
+  return board;
+}
+
+async function initBoard() {
+  // 盤面の初期化。TODO: 初期化後の盤面番号と最大得点を表示する
+  board_num = document.getElementById("boardNum").value; // 0-indexed
+  str_board = (await getBoardStr(board_num))["board_str"] + "100000";
+  isLocked = false;
+  hama_sente = 0;
+  hama_gote = 0;
+  board = strToBoard(str_board, board);
 }
 
 document.addEventListener("DOMContentLoaded", async function () {
   board_num = Math.floor(Math.random() * n_board);
   str_board = (await getBoardStr(board_num))["board_str"] + "100000";
-  const board = document.getElementById("board"); // 盤面表示用
+  let board = document.getElementById("board"); // 盤面表示用
   const historyDiv = document.getElementById("history"); // 履歴表示用
   const boardNumDiv = document.getElementById("board_num_str"); // 盤面番号・最大得点の表示用
   const passButton = document.getElementById("pass"); // passボタン
@@ -78,26 +79,13 @@ document.addEventListener("DOMContentLoaded", async function () {
   for (let i = 0; i < size * size; i++) {
     const cell = document.createElement("div");
     cell.className = "cell";
-    cell.style.position = "relative";
     board.appendChild(cell);
-    const nextCell = board.children[i];
+  }
 
-    if (str_board.charAt(i) == "1") {
-      const stone = document.createElement("div");
-      stone.className = "stone black";
-      nextCell.appendChild(stone);
-    }
-    if (str_board.charAt(i) == "2") {
-      const stone = document.createElement("div");
-      stone.className = "stone white";
-      nextCell.appendChild(stone);
-    }
-    if (str_board.charAt(i) == "3") {
-      const stone = document.createElement("div");
-      stone.className = "stone red";
-      nextCell.appendChild(stone);
-    }
+  board = strToBoard(str_board, board);
 
+  for (let i = 0; i < size * size; i++) {
+    const cell = board.children[i];
     cell.addEventListener("click", async function () {
       if (isLocked) return;
       if (!this.firstChild) {
@@ -226,28 +214,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
 
         // 盤面の反映
-        for (let ii = 0; ii < size * size; ii++) {
-          const nextCell = board.children[ii];
-          if (nextCell.firstChild) {
-            // このセルに石がすでに置かれている場合
-            nextCell.removeChild(nextCell.firstChild); // 石を除去
-          }
-          if (str_board.charAt(ii) == "1") {
-            const stone = document.createElement("div");
-            stone.className = "stone black";
-            nextCell.appendChild(stone);
-          }
-          if (str_board.charAt(ii) == "2") {
-            const stone = document.createElement("div");
-            stone.className = "stone white";
-            nextCell.appendChild(stone);
-          }
-          if (str_board.charAt(ii) == "3") {
-            const stone = document.createElement("div");
-            stone.className = "stone red";
-            nextCell.appendChild(stone);
-          }
-        }
+        board = strToBoard(str_board, board);
       }
     });
   }
@@ -337,28 +304,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     // 盤面の反映
-    for (let ii = 0; ii < size * size; ii++) {
-      const nextCell = board.children[ii];
-      if (nextCell.firstChild) {
-        // このセルに石がすでに置かれている場合
-        nextCell.removeChild(nextCell.firstChild); // 石を除去
-      }
-      if (str_board.charAt(ii) == "1") {
-        const stone = document.createElement("div");
-        stone.className = "stone black";
-        nextCell.appendChild(stone);
-      }
-      if (str_board.charAt(ii) == "2") {
-        const stone = document.createElement("div");
-        stone.className = "stone white";
-        nextCell.appendChild(stone);
-      }
-      if (str_board.charAt(ii) == "3") {
-        const stone = document.createElement("div");
-        stone.className = "stone red";
-        nextCell.appendChild(stone);
-      }
-    }
+    board = strToBoard(str_board, board);
   });
 });
 
