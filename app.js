@@ -66,6 +66,17 @@ async function resetState() {
   initState(board_num);
 }
 
+function checkCalledGame() {
+  // 終局判定 (アゲハマ 8 個以上)
+  if (hama_sente >= 8) {
+    document.getElementById("history").innerHTML += "<br>10 点差で自分の勝ち";
+    isLocked = true;
+  } else if (hama_gote >= 8) {
+    document.getElementById("history").innerHTML += "<br>10 点差で相手の勝ち";
+    isLocked = true;
+  }
+}
+
 document.addEventListener("DOMContentLoaded", async function () {
   let board = document.getElementById("board"); // 盤面表示用
   const historyDiv = document.getElementById("history"); // 履歴表示用
@@ -130,13 +141,7 @@ document.addEventListener("DOMContentLoaded", async function () {
           String(hama_gote).padStart(2, "0");
 
         // 終局判定 (アゲハマ 8 個以上)
-        if (hama_sente >= 8) {
-          historyDiv.innerHTML += "<br>10 点差で自分の勝ち";
-          isLocked = true;
-        } else if (hama_gote >= 8) {
-          historyDiv.innerHTML += "<br>10 点差で相手の勝ち";
-          isLocked = true;
-        }
+        checkCalledGame();
 
         // 相手の番
         if (!isLocked) {
@@ -200,13 +205,7 @@ document.addEventListener("DOMContentLoaded", async function () {
           }
 
           // 終局判定 (アゲハマ 8 個以上)
-          if (hama_sente >= 8) {
-            historyDiv.innerHTML += "<br>10 点差で自分の勝ち";
-            isLocked = true;
-          } else if (hama_gote >= 8) {
-            historyDiv.innerHTML += "<br>10 点差で相手の勝ち";
-            isLocked = true;
-          }
+          checkCalledGame();
         }
 
         // 盤面の反映
@@ -290,13 +289,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       }
 
       // 終局判定 (アゲハマ 8 個以上)
-      if (hama_sente >= 8) {
-        historyDiv.innerHTML += "<br>10 点差で自分の勝ち";
-        isLocked = true;
-      } else if (hama_gote >= 8) {
-        historyDiv.innerHTML += "<br>10 点差で相手の勝ち";
-        isLocked = true;
-      }
+      checkCalledGame();
     }
 
     // 盤面の反映
