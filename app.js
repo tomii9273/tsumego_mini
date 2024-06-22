@@ -42,39 +42,34 @@ function strToBoard(str_board, board) {
   return board;
 }
 
-async function initBoard() {
-  // 盤面の初期化。TODO: 初期化後の盤面番号と最大得点を表示する
-  board_num = document.getElementById("boardNum").value; // 0-indexed
+async function initState(board_num) {
+  // ゲーム状態の初期化
   str_board = (await getBoardStr(board_num))["board_str"] + "100000";
+  board = strToBoard(str_board, board);
   isLocked = false;
   hama_sente = 0;
   hama_gote = 0;
-  board = strToBoard(str_board, board);
+  let scorexy = await placeStone(str_board);
+  document.getElementById("board_num_str").innerHTML = `No.${String(board_num)} 最大得点:${scorexy["score"]}`;
+  document.getElementById("history").innerHTML += `<br>ゲーム開始 No.${String(board_num)} 最大得点:${scorexy["score"]}`;
+
+  console.log(
+    `No.${String(board_num)} 最大得点:${scorexy["score"]} str_board:${str_board} 黒の最善手:(${scorexy["x"]},${
+      scorexy["y"]
+    })`
+  );
+}
+
+async function resetState() {
+  // 「作成」ボタンによるゲーム状態の再設定
+  board_num = document.getElementById("boardNum").value; // 0-indexed
+  initState(board_num);
 }
 
 document.addEventListener("DOMContentLoaded", async function () {
-  board_num = Math.floor(Math.random() * n_board);
-  str_board = (await getBoardStr(board_num))["board_str"] + "100000";
   let board = document.getElementById("board"); // 盤面表示用
   const historyDiv = document.getElementById("history"); // 履歴表示用
-  const boardNumDiv = document.getElementById("board_num_str"); // 盤面番号・最大得点の表示用
   const passButton = document.getElementById("pass"); // passボタン
-
-  let scorexy = await placeStone(str_board);
-  boardNumDiv.innerHTML = "No." + String(board_num) + " 最大得点:" + scorexy["score"];
-  console.log(
-    "No." +
-      String(board_num) +
-      " 最大得点:" +
-      scorexy["score"] +
-      " str_board:" +
-      str_board +
-      " 黒の最善手:(" +
-      scorexy["x"] +
-      ", " +
-      scorexy["y"] +
-      ")"
-  );
 
   for (let i = 0; i < size * size; i++) {
     const cell = document.createElement("div");
@@ -82,7 +77,8 @@ document.addEventListener("DOMContentLoaded", async function () {
     board.appendChild(cell);
   }
 
-  board = strToBoard(str_board, board);
+  board_num = Math.floor(Math.random() * n_board);
+  initState(board_num);
 
   for (let i = 0; i < size * size; i++) {
     const cell = board.children[i];
