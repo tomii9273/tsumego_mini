@@ -77,6 +77,67 @@ function checkCalledGame() {
   }
 }
 
+function putStone(i, turn_sente) {
+  // 石を地点 i に置く (turn_sente なら先手が、そうでないなら後手が置く)
+  let stone_col_self, stone_col_opponent;
+  if (turn_sente) {
+    stone_col_self = "黒";
+    stone_col_opponent = "白";
+  } else {
+    stone_col_self = "白";
+    stone_col_opponent = "黒";
+  }
+  let row = Math.floor(i / size);
+  let col = i % size;
+  document.getElementById("history").innerHTML += `<br>${stone_col_self}石を置いた: (${row + 1}, ${col + 1})`;
+  str_board = str_board.substr(0, i) + String(2 - Number(turn_sente)) + str_board.substr(i + 1);
+
+  // 石を取る処理
+  let taken_stones = 0;
+  for (let [drow, dcol] of DI) {
+    if (0 <= row + drow && row + drow < N && 0 <= col + dcol && col + dcol < N) {
+      if (str_board.charAt((row + drow) * N + col + dcol) != str_board.charAt(i)) {
+        let [str_b, n_stone] = takeStone(row + drow, col + dcol, str_board);
+        str_board = str_b;
+        taken_stones += n_stone;
+      }
+    }
+  }
+  if (turn_sente) {
+    hama_sente += taken_stones;
+  } else {
+    hama_gote += taken_stones;
+  }
+  if (taken_stones > 0) {
+    document.getElementById("history").innerHTML += `<br>相手の${stone_col_opponent}石 ${taken_stones} 個を取った`;
+  }
+  let [str_b, n_stone] = takeStone(row, col, str_board);
+  str_board = str_b;
+  if (turn_sente) {
+    hama_gote += n_stone;
+  } else {
+    hama_sente += n_stone;
+  }
+  if (n_stone > 0) {
+    document.getElementById("history").innerHTML += `<br>自分の${stone_col_self}石 ${n_stone} 個を取られた`;
+  }
+
+  // コウの処理
+  for (let ii = 0; ii < size * size; ii++) {
+    if (str_board.charAt(ii) == "3") {
+      str_board = str_board.substr(0, ii) + "0" + str_board.substr(ii + 1);
+    }
+  }
+  let [kou_row, kou_col] = checkKou(str_board, row, col, taken_stones, 1);
+  if (kou_row != -1) {
+    historyDiv.innerHTML += `<br>コウのためこの座標には打てません: (${kou_row + 1}, ${kou_col + 1})`;
+    str_board = str_board.substr(0, kou_row * size + kou_col) + "3" + str_board.substr(kou_row * size + kou_col + 1);
+  }
+  str_board = str_board.substr(0, size * size) + String(1 - turn_sente) + "0" + str_board.substr(size * size + 2);
+  str_board =
+    str_board.substr(0, size * size + 2) + String(hama_sente).padStart(2, "0") + String(hama_gote).padStart(2, "0");
+}
+
 document.addEventListener("DOMContentLoaded", async function () {
   let board = document.getElementById("board"); // 盤面表示用
   const historyDiv = document.getElementById("history"); // 履歴表示用
@@ -95,50 +156,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     const cell = board.children[i];
     cell.addEventListener("click", async function () {
       if (isLocked) return;
+      // すでに石が置かれていないことを確認
       if (!this.firstChild) {
-        // すでに石が置かれていないことを確認
-        let row = Math.floor(i / size);
-        let col = i % size;
-        historyDiv.innerHTML += `<br>黒石を置いた: (${row + 1}, ${col + 1})`;
-        str_board = str_board.substr(0, i) + "1" + str_board.substr(i + 1);
-        let taken_stones = 0;
-        for (let [drow, dcol] of DI) {
-          if (0 <= row + drow && row + drow < N && 0 <= col + dcol && col + dcol < N) {
-            if (str_board.charAt((row + drow) * N + col + dcol) != str_board.charAt(i)) {
-              let [str_b, n_stone] = takeStone(row + drow, col + dcol, str_board);
-              str_board = str_b;
-              taken_stones += n_stone;
-            }
-          }
-        }
-        hama_sente += taken_stones;
-        if (taken_stones > 0) {
-          historyDiv.innerHTML += `<br>相手の白石 ${taken_stones} 個を取った`;
-        }
-        let [str_b, n_stone] = takeStone(row, col, str_board);
-        str_board = str_b;
-        hama_gote += n_stone;
-        if (n_stone > 0) {
-          historyDiv.innerHTML += `<br>自分の黒石 ${n_stone} 個を取られた`;
-        }
-
-        // コウの処理
-        for (let ii = 0; ii < size * size; ii++) {
-          if (str_board.charAt(ii) == "3") {
-            str_board = str_board.substr(0, ii) + "0" + str_board.substr(ii + 1);
-          }
-        }
-        let [kou_row, kou_col] = checkKou(str_board, row, col, taken_stones, 1);
-        if (kou_row != -1) {
-          historyDiv.innerHTML += `<br>コウのためこの座標には打てません: (${kou_row + 1}, ${kou_col + 1})`;
-          str_board =
-            str_board.substr(0, kou_row * size + kou_col) + "3" + str_board.substr(kou_row * size + kou_col + 1);
-        }
-        str_board = str_board.substr(0, size * size) + "00" + str_board.substr(size * size + 2);
-        str_board =
-          str_board.substr(0, size * size + 2) +
-          String(hama_sente).padStart(2, "0") +
-          String(hama_gote).padStart(2, "0");
+        putStone((i = i), (turn_sente = true));
 
         // 終局判定 (アゲハマ 8 個以上)
         checkCalledGame();
@@ -161,47 +181,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
             str_board = str_board.substr(0, size * size) + "11" + str_board.substr(size * size + 2);
           } else {
-            historyDiv.innerHTML += `<br>白石を置いた: (${row + 1}, ${col + 1})`;
-            str_board = str_board.substr(0, j) + "2" + str_board.substr(j + 1);
-            taken_stones = 0;
-            for (let [drow, dcol] of DI) {
-              if (0 <= row + drow && row + drow < N && 0 <= col + dcol && col + dcol < N) {
-                if (str_board.charAt((row + drow) * N + col + dcol) != str_board.charAt(j)) {
-                  let [str_b, n_stone] = takeStone(row + drow, col + dcol, str_board);
-                  str_board = str_b;
-                  taken_stones += n_stone;
-                }
-              }
-            }
-            hama_gote += taken_stones;
-            if (taken_stones > 0) {
-              historyDiv.innerHTML += `<br>相手の黒石 ${taken_stones} 個を取った`;
-            }
-            [str_b, n_stone] = takeStone(row, col, str_board);
-            str_board = str_b;
-            hama_sente += n_stone;
-            if (n_stone > 0) {
-              historyDiv.innerHTML += `<br>自分の白石 ${n_stone} 個を取られた`;
-            }
-
-            // コウの処理
-            for (let ii = 0; ii < size * size; ii++) {
-              if (str_board.charAt(ii) == "3") {
-                str_board = str_board.substr(0, ii) + "0" + str_board.substr(ii + 1);
-              }
-            }
-            let [kou_row, kou_col] = checkKou(str_board, row, col, taken_stones, 2);
-            if (kou_row != -1) {
-              historyDiv.innerHTML += `<br>コウのためこの座標には打てません: (${kou_row + 1}, ${kou_col + 1})`;
-              str_board =
-                str_board.substr(0, kou_row * size + kou_col) + "3" + str_board.substr(kou_row * size + kou_col + 1);
-            }
-
-            str_board = str_board.substr(0, size * size) + "10" + str_board.substr(size * size + 2);
-            str_board =
-              str_board.substr(0, size * size + 2) +
-              String(hama_sente).padStart(2, "0") +
-              String(hama_gote).padStart(2, "0");
+            putStone((i = j), (turn_sente = false));
           }
 
           // 終局判定 (アゲハマ 8 個以上)
@@ -245,47 +225,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         str_board = str_board.substr(0, size * size) + "11" + str_board.substr(size * size + 2);
       } else {
-        historyDiv.innerHTML += `<br>白石を置いた: (${row + 1}, ${col + 1})`;
-        str_board = str_board.substr(0, j) + "2" + str_board.substr(j + 1);
-        taken_stones = 0;
-        for (let [drow, dcol] of DI) {
-          if (0 <= row + drow && row + drow < N && 0 <= col + dcol && col + dcol < N) {
-            if (str_board.charAt((row + drow) * N + col + dcol) != str_board.charAt(j)) {
-              let [str_b, n_stone] = takeStone(row + drow, col + dcol, str_board);
-              str_board = str_b;
-              taken_stones += n_stone;
-            }
-          }
-        }
-        hama_gote += taken_stones;
-        if (taken_stones > 0) {
-          historyDiv.innerHTML += `<br>相手の黒石 ${taken_stones} 個を取った`;
-        }
-        [str_b, n_stone] = takeStone(row, col, str_board);
-        str_board = str_b;
-        hama_sente += n_stone;
-        if (n_stone > 0) {
-          historyDiv.innerHTML += `<br>自分の白石 ${n_stone} 個を取られた`;
-        }
-
-        // コウの処理
-        for (let ii = 0; ii < size * size; ii++) {
-          if (str_board.charAt(ii) == "3") {
-            str_board = str_board.substr(0, ii) + "0" + str_board.substr(ii + 1);
-          }
-        }
-        let [kou_row, kou_col] = checkKou(str_board, row, col, taken_stones, 2);
-        if (kou_row != -1) {
-          historyDiv.innerHTML += `<br>コウのためこの座標には打てません: (${kou_row + 1}, ${kou_col + 1})`;
-          str_board =
-            str_board.substr(0, kou_row * size + kou_col) + "3" + str_board.substr(kou_row * size + kou_col + 1);
-        }
-
-        str_board = str_board.substr(0, size * size) + "10" + str_board.substr(size * size + 2);
-        str_board =
-          str_board.substr(0, size * size + 2) +
-          String(hama_sente).padStart(2, "0") +
-          String(hama_gote).padStart(2, "0");
+        putStone((i = j), (turn_sente = false));
       }
 
       // 終局判定 (アゲハマ 8 個以上)
