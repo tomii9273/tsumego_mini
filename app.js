@@ -146,6 +146,19 @@ function putStone(i, turn_sente) {
     str_board.substr(0, size * size + 2) + String(hama_sente).padStart(2, "0") + String(hama_gote).padStart(2, "0");
 }
 
+function passTurn(turn_sente) {
+  // パスをする (turn_sente なら先手が、そうでないなら後手がする)
+  let stone_col_self;
+  if (turn_sente) {
+    stone_col_self = "黒";
+  } else {
+    stone_col_self = "白";
+  }
+  document.getElementById("history").innerHTML += `<br>${stone_col_self}はパスをした`;
+  checkConsecutivePass(); // 終局判定 (連続パス)
+  str_board = str_board.substr(0, size * size) + String(1 - turn_sente) + "1" + str_board.substr(size * size + 2);
+}
+
 document.addEventListener("DOMContentLoaded", async function () {
   let board = document.getElementById("board"); // 盤面表示用
   const historyDiv = document.getElementById("history"); // 履歴表示用
@@ -179,12 +192,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
           let j = row * size + col;
           if (row == -1) {
-            historyDiv.innerHTML += "<br>白はパスをした";
-
-            // 終局判定 (連続パス)
-            checkConsecutivePass();
-
-            str_board = str_board.substr(0, size * size) + "11" + str_board.substr(size * size + 2);
+            passTurn((turn_sente = false));
           } else {
             putStone((i = j), (turn_sente = false));
           }
@@ -201,12 +209,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   passButton.addEventListener("click", async function () {
     if (isLocked) return;
-    historyDiv.innerHTML += "<br>黒はパスをした";
-
-    // 終局判定 (連続パス)
-    checkConsecutivePass();
-
-    str_board = str_board.substr(0, size * size) + "01" + str_board.substr(size * size + 2);
+    passTurn((turn_sente = true));
 
     // 相手の番
     if (!isLocked) {
@@ -217,12 +220,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       let j = row * size + col;
 
       if (row == -1) {
-        historyDiv.innerHTML += "<br>白はパスをした";
-
-        // 終局判定 (連続パス)
-        checkConsecutivePass();
-
-        str_board = str_board.substr(0, size * size) + "11" + str_board.substr(size * size + 2);
+        passTurn((turn_sente = false));
       } else {
         putStone((i = j), (turn_sente = false));
       }
