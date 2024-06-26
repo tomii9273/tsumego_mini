@@ -77,6 +77,14 @@ function checkCalledGame() {
   }
 }
 
+function checkConsecutivePass() {
+  // 終局判定 (連続パス)
+  if (str_board.charAt(size * size + 1) == "1") {
+    document.getElementById("history").innerHTML += countStone(str_board);
+    isLocked = true;
+  }
+}
+
 function putStone(i, turn_sente) {
   // 石を地点 i に置く (turn_sente なら先手が、そうでないなら後手が置く)
   let stone_col_self, stone_col_opponent;
@@ -174,10 +182,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             historyDiv.innerHTML += "<br>白はパスをした";
 
             // 終局判定 (連続パス)
-            if (str_board.charAt(size * size + 1) == "1") {
-              historyDiv.innerHTML += countStone(str_board);
-              isLocked = true;
-            }
+            checkConsecutivePass();
 
             str_board = str_board.substr(0, size * size) + "11" + str_board.substr(size * size + 2);
           } else {
@@ -199,10 +204,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     historyDiv.innerHTML += "<br>黒はパスをした";
 
     // 終局判定 (連続パス)
-    if (str_board.charAt(size * size + 1) == "1") {
-      historyDiv.innerHTML += countStone(str_board);
-      isLocked = true;
-    }
+    checkConsecutivePass();
 
     str_board = str_board.substr(0, size * size) + "01" + str_board.substr(size * size + 2);
 
@@ -218,10 +220,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         historyDiv.innerHTML += "<br>白はパスをした";
 
         // 終局判定 (連続パス)
-        if (str_board.charAt(size * size + 1) == "1") {
-          historyDiv.innerHTML += countStone(str_board);
-          isLocked = true;
-        }
+        checkConsecutivePass();
 
         str_board = str_board.substr(0, size * size) + "11" + str_board.substr(size * size + 2);
       } else {
