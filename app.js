@@ -138,7 +138,9 @@ function putStone(i, turn_sente) {
   }
   let [kou_row, kou_col] = checkKou(str_board, row, col, taken_stones, 1);
   if (kou_row != -1) {
-    historyDiv.innerHTML += `<br>コウのためこの座標には打てません: (${kou_row + 1}, ${kou_col + 1})`;
+    document.getElementById("history").innerHTML += `<br>コウのためこの座標には打てません: (${kou_row + 1}, ${
+      kou_col + 1
+    })`;
     str_board = str_board.substr(0, kou_row * size + kou_col) + "3" + str_board.substr(kou_row * size + kou_col + 1);
   }
   str_board = str_board.substr(0, size * size) + String(1 - turn_sente) + "0" + str_board.substr(size * size + 2);
