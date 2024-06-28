@@ -197,7 +197,7 @@ document.addEventListener("DOMContentLoaded", async function () {
           let j = scorexy["x"] * size + scorexy["y"];
 
           if (scorexy["x"] == -1) {
-            passTurn((turn_sente = false));
+            passTurn(false);
           } else {
             putStone(j, false);
           }
@@ -210,7 +210,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   // パスボタンの設定
   passButton.addEventListener("click", async function () {
     if (isLocked) return;
-    passTurn((turn_sente = true));
+    passTurn(true);
 
     // 相手の番
     if (!isLocked) {
@@ -218,7 +218,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       let j = scorexy["x"] * size + scorexy["y"];
 
       if (scorexy["x"] == -1) {
-        passTurn((turn_sente = false));
+        passTurn(false);
       } else {
         putStone(j, false);
       }
