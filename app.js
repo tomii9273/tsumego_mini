@@ -1,11 +1,11 @@
-const SIZE = 3;
-const n_board = 5026;
+const SIZE = 3; // 盤面の一辺の交点数
+const N_INITBOARD = 5026; // 初期盤面の総数 (SQL で取得できるが、時間短縮のため直接指定)
 
-const DI = [
-  [0, 1], // 右
+const DIRECTION = [
+  [-1, 0], // 上
   [1, 0], // 下
   [0, -1], // 左
-  [-1, 0], // 上
+  [0, 1], // 右
 ];
 
 var board_num = 0;
@@ -95,7 +95,7 @@ function putStone(row, col, turn_sente) {
 
   // 石を取る処理
   let taken_stones = 0;
-  for (let [drow, dcol] of DI) {
+  for (let [drow, dcol] of DIRECTION) {
     if (0 <= row + drow && row + drow < SIZE && 0 <= col + dcol && col + dcol < SIZE) {
       if (str_board.charAt((row + drow) * SIZE + col + dcol) != str_board.charAt(i)) {
         let [str_b, n_stone] = takeStone(row + drow, col + dcol, str_board);
@@ -171,7 +171,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     board.appendChild(cell);
   }
 
-  board_num = Math.floor(Math.random() * n_board);
+  board_num = Math.floor(Math.random() * N_INITBOARD);
   initState(board_num);
 
   // 石を置く場所の設定
@@ -224,7 +224,7 @@ function checkKou(str_board, row, col, n_taken_stone_sum, my_stone_col) {
   }
   let ng_place = [-1, -1];
   let cnt = 0;
-  for (let [drow, dcol] of DI) {
+  for (let [drow, dcol] of DIRECTION) {
     if (
       0 <= row + drow &&
       row + drow < SIZE &&
@@ -283,7 +283,7 @@ function takeStone(pi, pj, board_str) {
 
   while (ind < Q.length) {
     let [i, j] = Q[ind];
-    for (let [di, dj] of DI) {
+    for (let [di, dj] of DIRECTION) {
       if (0 <= i + di && i + di < SIZE && 0 <= j + dj && j + dj < SIZE) {
         if (board[i + di][j + dj] === col) {
           if (!visited[i + di][j + dj]) {
