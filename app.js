@@ -16,23 +16,26 @@ var isLocked = false; // 勝負がついたらロックして石を置けない�
 
 function strToBoard(str_board, board) {
   // 盤面文字列 (9 桁以上) から盤面を生成
-  for (let i = 0; i < SIZE * SIZE; i++) {
-    const nextCell = board.children[i];
+  for (let idx = 0; idx < SIZE * SIZE; idx++) {
+    const nextCell = board.children[idx];
     if (nextCell.firstChild) {
-      // このセルに石がすでに置かれている場合
-      nextCell.removeChild(nextCell.firstChild); // 石を除去
+      // このセルに石がすでに置かれている場合は一旦除去
+      nextCell.removeChild(nextCell.firstChild);
     }
-    if (str_board.charAt(i) == "1") {
+    if (str_board.charAt(idx) == "1") {
+      // 黒石を置く
       const stone = document.createElement("div");
       stone.className = "stone black";
       nextCell.appendChild(stone);
     }
-    if (str_board.charAt(i) == "2") {
+    if (str_board.charAt(idx) == "2") {
+      // 白石を置く
       const stone = document.createElement("div");
       stone.className = "stone white";
       nextCell.appendChild(stone);
     }
-    if (str_board.charAt(i) == "3") {
+    if (str_board.charAt(idx) == "3") {
+      // 赤石 (コウで次に置けないことを示す) を置く
       const stone = document.createElement("div");
       stone.className = "stone red";
       nextCell.appendChild(stone);
@@ -89,15 +92,15 @@ function putStone(row, col, turn_sente) {
     stone_col_self = "白";
     stone_col_opponent = "黒";
   }
-  let i = row * SIZE + col;
+  let idx = row * SIZE + col;
   document.getElementById("history").innerHTML += `<br>&ensp;${stone_col_self}石を置いた: (${row + 1}, ${col + 1})`;
-  str_board = str_board.substr(0, i) + String(2 - Number(turn_sente)) + str_board.substr(i + 1);
+  str_board = str_board.substr(0, idx) + String(2 - Number(turn_sente)) + str_board.substr(idx + 1);
 
   // 石を取る処理
   let taken_stones = 0;
   for (let [drow, dcol] of DIRECTION) {
     if (0 <= row + drow && row + drow < SIZE && 0 <= col + dcol && col + dcol < SIZE) {
-      if (str_board.charAt((row + drow) * SIZE + col + dcol) != str_board.charAt(i)) {
+      if (str_board.charAt((row + drow) * SIZE + col + dcol) != str_board.charAt(idx)) {
         let [str_b, n_stone] = takeStone(row + drow, col + dcol, str_board);
         str_board = str_b;
         taken_stones += n_stone;
@@ -126,9 +129,9 @@ function putStone(row, col, turn_sente) {
   }
 
   // コウの処理
-  for (let ii = 0; ii < SIZE * SIZE; ii++) {
-    if (str_board.charAt(ii) == "3") {
-      str_board = str_board.substr(0, ii) + "0" + str_board.substr(ii + 1);
+  for (let idx = 0; idx < SIZE * SIZE; idx++) {
+    if (str_board.charAt(idx) == "3") {
+      str_board = str_board.substr(0, idx) + "0" + str_board.substr(idx + 1);
     }
   }
   let [kou_row, kou_col] = checkKou(str_board, row, col, taken_stones, 2 - turn_sente);
@@ -165,7 +168,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   const historyDiv = document.getElementById("history"); // 履歴表示用
   const passButton = document.getElementById("pass"); // passボタン
 
-  for (let i = 0; i < SIZE * SIZE; i++) {
+  for (let idx = 0; idx < SIZE * SIZE; idx++) {
     const cell = document.createElement("div");
     cell.className = "cell";
     board.appendChild(cell);
@@ -175,10 +178,10 @@ document.addEventListener("DOMContentLoaded", async function () {
   initState(board_num);
 
   // 石を置く場所の設定
-  for (let i = 0; i < SIZE * SIZE; i++) {
-    let row_sente = Math.floor(i / SIZE);
-    let col_sente = i % SIZE;
-    const cell = board.children[i];
+  for (let idx = 0; idx < SIZE * SIZE; idx++) {
+    let row_sente = Math.floor(idx / SIZE);
+    let col_sente = idx % SIZE;
+    const cell = board.children[idx];
     cell.addEventListener("click", async function () {
       if (isLocked) return;
       // すでに石が置かれていないことを確認
@@ -261,55 +264,55 @@ function countStone(str_board) {
   return output;
 }
 
-function takeStone(pi, pj, board_str) {
-  // (pi, pj) と連結する石を取れるなら取って、盤面と取った石の数を返す
+function takeStone(prow, pcol, board_str) {
+  // (prow, pcol) と連結する石を取れるなら取って、盤面と取った石の数を返す
 
   let board = [
     [0, 0, 0],
     [0, 0, 0],
     [0, 0, 0],
   ];
-  for (let i = 0; i < SIZE; i++) {
-    for (let j = 0; j < SIZE; j++) {
-      board[i][j] = Number(board_str[i * SIZE + j]);
+  for (let row = 0; row < SIZE; row++) {
+    for (let col = 0; col < SIZE; col++) {
+      board[row][col] = Number(board_str[row * SIZE + col]);
     }
   }
 
-  let col = board[pi][pj];
+  let color = board[prow][pcol];
   let visited = Array.from({ length: SIZE }, () => Array(SIZE).fill(false));
-  let Q = [[pi, pj]];
-  visited[pi][pj] = true;
-  let ind = 0;
+  let Q = [[prow, pcol]];
+  visited[prow][pcol] = true;
+  let idx = 0;
 
-  while (ind < Q.length) {
-    let [i, j] = Q[ind];
-    for (let [di, dj] of DIRECTION) {
-      if (0 <= i + di && i + di < SIZE && 0 <= j + dj && j + dj < SIZE) {
-        if (board[i + di][j + dj] === col) {
-          if (!visited[i + di][j + dj]) {
-            visited[i + di][j + dj] = true;
-            Q.push([i + di, j + dj]);
+  while (idx < Q.length) {
+    let [row, col] = Q[idx];
+    for (let [drow, dcol] of DIRECTION) {
+      if (0 <= row + drow && row + drow < SIZE && 0 <= col + dcol && col + dcol < SIZE) {
+        if (board[row + drow][col + dcol] === color) {
+          if (!visited[row + drow][col + dcol]) {
+            visited[row + drow][col + dcol] = true;
+            Q.push([row + drow, col + dcol]);
           }
-        } else if (board[i + di][j + dj] !== 3 - col) {
+        } else if (board[row + drow][col + dcol] !== 3 - color) {
           // 自石でも相手石でもない点 (= 空点) と隣接しているので取れない
           return [board_str, 0];
         }
       }
     }
-    ind++;
+    idx++;
   }
 
   // 取れる
-  for (let [i, j] of Q) {
-    board[i][j] = 0;
+  for (let [row, col] of Q) {
+    board[row][col] = 0;
   }
 
   console.log("board:", board);
 
   let board_str_ans = "";
-  for (let i = 0; i < SIZE; i++) {
-    for (let j = 0; j < SIZE; j++) {
-      board_str_ans += String(board[i][j]);
+  for (let row = 0; row < SIZE; row++) {
+    for (let col = 0; col < SIZE; col++) {
+      board_str_ans += String(board[row][col]);
     }
   }
   board_str_ans += board_str.substr(SIZE * SIZE);
