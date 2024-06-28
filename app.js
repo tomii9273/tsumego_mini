@@ -49,15 +49,10 @@ async function initState(board_num) {
   isLocked = false;
   hama_sente = 0;
   hama_gote = 0;
-  let scorexy = await placeStone(str_board);
-  document.getElementById("board_num_str").innerHTML = `No.${String(board_num)} 最大得点:${scorexy["score"]}`;
-  document.getElementById("history").innerHTML += `<br>ゲーム開始 No.${String(board_num)} 最大得点:${scorexy["score"]}`;
-
-  console.log(
-    `No.${String(board_num)} 最大得点:${scorexy["score"]} str_board:${str_board} 黒の最善手:(${scorexy["x"]},${
-      scorexy["y"]
-    })`
-  );
+  let [row, col, score] = await getPlaceScore(str_board);
+  document.getElementById("board_num_str").innerHTML = `No.${String(board_num)} 最大得点:${score}`;
+  document.getElementById("history").innerHTML += `<br>ゲーム開始 No.${String(board_num)} 最大得点:${score}`;
+  console.log(`No.${String(board_num)} 最大得点:${score} str_board:${str_board} 黒の最善手:(${row},${col})`);
 }
 
 async function resetState() {
@@ -193,10 +188,9 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         // 相手の番
         if (!isLocked) {
-          let scorexy = await placeStone(str_board);
-          let j = scorexy["x"] * size + scorexy["y"];
-
-          if (scorexy["x"] == -1) {
+          let [row, col, _] = await getPlaceScore(str_board);
+          let j = row * size + col;
+          if (row == -1) {
             passTurn(false);
           } else {
             putStone(j, false);
@@ -214,10 +208,9 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     // 相手の番
     if (!isLocked) {
-      let scorexy = await placeStone(str_board);
-      let j = scorexy["x"] * size + scorexy["y"];
-
-      if (scorexy["x"] == -1) {
+      let [row, col, _] = await getPlaceScore(str_board);
+      let j = row * size + col;
+      if (row == -1) {
         passTurn(false);
       } else {
         putStone(j, false);
@@ -326,7 +319,7 @@ function takeStone(pi, pj, board_str) {
   return [board_str_ans, Q.length];
 }
 
-async function placeStone(board) {
+async function getPlaceScore(board) {
   // 盤面文字列 (15 桁) から最善手・そのときの最大スコアを取得
   const data = { board: board };
 
@@ -341,9 +334,9 @@ async function placeStone(board) {
     });
 
     // レスポンスをJSONとしてパース
-    const responseData = await response.json();
+    const res = await response.json();
 
-    return responseData;
+    return [res["x"], res["y"], res["score"]];
   } catch (error) {
     console.error("Error:", error);
     return null;
