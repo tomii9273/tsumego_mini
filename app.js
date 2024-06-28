@@ -69,10 +69,10 @@ async function resetState() {
 function checkCalledGame() {
   // 終局判定 (アゲハマ 8 個以上)
   if (hama_sente >= 8) {
-    document.getElementById("history").innerHTML += "<br>10 点差で自分の勝ち";
+    document.getElementById("history").innerHTML += "<br>ゲーム終了<br>&ensp;10 点差で自分の勝ち";
     isLocked = true;
   } else if (hama_gote >= 8) {
-    document.getElementById("history").innerHTML += "<br>10 点差で相手の勝ち";
+    document.getElementById("history").innerHTML += "<br>ゲーム終了<br>&ensp;10 点差で相手の勝ち";
     isLocked = true;
   }
 }
@@ -80,7 +80,7 @@ function checkCalledGame() {
 function checkConsecutivePass() {
   // 終局判定 (連続パス)
   if (str_board.charAt(size * size + 1) == "1") {
-    document.getElementById("history").innerHTML += countStone(str_board);
+    document.getElementById("history").innerHTML += "<br>ゲーム終了" + countStone(str_board);
     isLocked = true;
   }
 }
@@ -97,7 +97,7 @@ function putStone(i, turn_sente) {
   }
   let row = Math.floor(i / size);
   let col = i % size;
-  document.getElementById("history").innerHTML += `<br>${stone_col_self}石を置いた: (${row + 1}, ${col + 1})`;
+  document.getElementById("history").innerHTML += `<br>&ensp;${stone_col_self}石を置いた: (${row + 1}, ${col + 1})`;
   str_board = str_board.substr(0, i) + String(2 - Number(turn_sente)) + str_board.substr(i + 1);
 
   // 石を取る処理
@@ -117,7 +117,9 @@ function putStone(i, turn_sente) {
     hama_gote += taken_stones;
   }
   if (taken_stones > 0) {
-    document.getElementById("history").innerHTML += `<br>相手の${stone_col_opponent}石 ${taken_stones} 個を取った`;
+    document.getElementById(
+      "history"
+    ).innerHTML += `<br>&ensp;&ensp;相手の${stone_col_opponent}石 ${taken_stones} 個を取った`;
   }
   let [str_b, n_stone] = takeStone(row, col, str_board);
   str_board = str_b;
@@ -127,7 +129,7 @@ function putStone(i, turn_sente) {
     hama_sente += n_stone;
   }
   if (n_stone > 0) {
-    document.getElementById("history").innerHTML += `<br>自分の${stone_col_self}石 ${n_stone} 個を取られた`;
+    document.getElementById("history").innerHTML += `<br>&ensp;&ensp;自分の${stone_col_self}石 ${n_stone} 個を取られた`;
   }
 
   // コウの処理
@@ -138,7 +140,9 @@ function putStone(i, turn_sente) {
   }
   let [kou_row, kou_col] = checkKou(str_board, row, col, taken_stones, 2 - turn_sente);
   if (kou_row != -1) {
-    document.getElementById("history").innerHTML += `<br>コウのためこの座標には打てません: (${kou_row + 1}, ${
+    document.getElementById(
+      "history"
+    ).innerHTML += `<br>&ensp;&ensp;コウのため次${stone_col_opponent}はここに打てません: (${kou_row + 1}, ${
       kou_col + 1
     })`;
     str_board = str_board.substr(0, kou_row * size + kou_col) + "3" + str_board.substr(kou_row * size + kou_col + 1);
@@ -157,7 +161,7 @@ function passTurn(turn_sente) {
   } else {
     stone_col_self = "白";
   }
-  document.getElementById("history").innerHTML += `<br>${stone_col_self}はパスをした`;
+  document.getElementById("history").innerHTML += `<br>&ensp;${stone_col_self}はパスをした`;
   checkConsecutivePass(); // 終局判定 (連続パス)
   str_board = str_board.substr(0, size * size) + String(1 - turn_sente) + "1" + str_board.substr(size * size + 2);
   board = strToBoard(str_board, board); // 盤面の反映
@@ -264,13 +268,13 @@ function countStone(str_board) {
   output = "";
   let n_black = (str_board.substr(0, size * size).match(/1/g) || []).length;
   let n_white = (str_board.substr(0, size * size).match(/2/g) || []).length;
-  output += `<br>黒石: ${n_black} 個、白石: ${n_white} 個`;
+  output += `<br>&ensp;黒石: ${n_black} 個、白石: ${n_white} 個`;
   if (n_black > n_white) {
-    output += `<br>${n_black - n_white} 点差で自分の勝ち`;
+    output += `<br>&ensp;${n_black - n_white} 点差で自分の勝ち`;
   } else if (n_black < n_white) {
-    output += `<br>${n_white - n_black} 点差で相手の勝ち`;
+    output += `<br>&ensp;${n_white - n_black} 点差で相手の勝ち`;
   } else {
-    output += "<br>引き分け";
+    output += "<br>&ensp;引き分け";
   }
   return output;
 }
