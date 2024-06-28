@@ -181,7 +181,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       if (isLocked) return;
       // すでに石が置かれていないことを確認
       if (!this.firstChild) {
-        putStone((i = i), (turn_sente = true));
+        putStone(i, true);
 
         // 終局判定 (アゲハマ 8 個以上)
         checkCalledGame();
@@ -196,7 +196,7 @@ document.addEventListener("DOMContentLoaded", async function () {
           if (row == -1) {
             passTurn((turn_sente = false));
           } else {
-            putStone((i = j), (turn_sente = false));
+            putStone(j, false);
           }
 
           // 終局判定 (アゲハマ 8 個以上)
@@ -224,7 +224,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       if (row == -1) {
         passTurn((turn_sente = false));
       } else {
-        putStone((i = j), (turn_sente = false));
+        putStone(j, false);
       }
 
       // 終局判定 (アゲハマ 8 個以上)
