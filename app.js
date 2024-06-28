@@ -146,6 +146,7 @@ function putStone(i, turn_sente) {
   str_board = str_board.substr(0, size * size) + String(1 - turn_sente) + "0" + str_board.substr(size * size + 2);
   str_board =
     str_board.substr(0, size * size + 2) + String(hama_sente).padStart(2, "0") + String(hama_gote).padStart(2, "0");
+  board = strToBoard(str_board, board); // 盤面の反映
 }
 
 function passTurn(turn_sente) {
@@ -159,6 +160,7 @@ function passTurn(turn_sente) {
   document.getElementById("history").innerHTML += `<br>${stone_col_self}はパスをした`;
   checkConsecutivePass(); // 終局判定 (連続パス)
   str_board = str_board.substr(0, size * size) + String(1 - turn_sente) + "1" + str_board.substr(size * size + 2);
+  board = strToBoard(str_board, board); // 盤面の反映
 }
 
 document.addEventListener("DOMContentLoaded", async function () {
@@ -202,9 +204,6 @@ document.addEventListener("DOMContentLoaded", async function () {
           // 終局判定 (アゲハマ 8 個以上)
           checkCalledGame();
         }
-
-        // 盤面の反映
-        board = strToBoard(str_board, board);
       }
     });
   }
@@ -230,9 +229,6 @@ document.addEventListener("DOMContentLoaded", async function () {
       // 終局判定 (アゲハマ 8 個以上)
       checkCalledGame();
     }
-
-    // 盤面の反映
-    board = strToBoard(str_board, board);
   });
 });
 
