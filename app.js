@@ -181,6 +181,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   board_num = Math.floor(Math.random() * n_board);
   initState(board_num);
 
+  // 石を置く場所の設定
   for (let i = 0; i < size * size; i++) {
     const cell = board.children[i];
     cell.addEventListener("click", async function () {
@@ -188,50 +189,40 @@ document.addEventListener("DOMContentLoaded", async function () {
       // すでに石が置かれていないことを確認
       if (!this.firstChild) {
         putStone(i, true);
-
-        // 終局判定 (アゲハマ 8 個以上)
-        checkCalledGame();
+        checkCalledGame(); // 終局判定 (アゲハマ 8 個以上)
 
         // 相手の番
         if (!isLocked) {
           let scorexy = await placeStone(str_board);
-          row = scorexy["x"];
-          col = scorexy["y"];
+          let j = scorexy["x"] * size + scorexy["y"];
 
-          let j = row * size + col;
-          if (row == -1) {
+          if (scorexy["x"] == -1) {
             passTurn((turn_sente = false));
           } else {
             putStone(j, false);
           }
-
-          // 終局判定 (アゲハマ 8 個以上)
-          checkCalledGame();
+          checkCalledGame(); // 終局判定 (アゲハマ 8 個以上)
         }
       }
     });
   }
 
+  // パスボタンの設定
   passButton.addEventListener("click", async function () {
     if (isLocked) return;
     passTurn((turn_sente = true));
 
     // 相手の番
     if (!isLocked) {
-      let taken_stones = 0;
       let scorexy = await placeStone(str_board);
-      let row = scorexy["x"];
-      let col = scorexy["y"];
-      let j = row * size + col;
+      let j = scorexy["x"] * size + scorexy["y"];
 
-      if (row == -1) {
+      if (scorexy["x"] == -1) {
         passTurn((turn_sente = false));
       } else {
         putStone(j, false);
       }
-
-      // 終局判定 (アゲハマ 8 個以上)
-      checkCalledGame();
+      checkCalledGame(); // 終局判定 (アゲハマ 8 個以上)
     }
   });
 });
