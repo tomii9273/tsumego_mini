@@ -80,8 +80,8 @@ function checkConsecutivePass() {
   }
 }
 
-function putStone(i, turn_sente) {
-  // 石を地点 i に置く (turn_sente なら先手が、そうでないなら後手が置く)
+function putStone(row, col, turn_sente) {
+  // 石を地点 (row, col) に置く (turn_sente なら先手が、そうでないなら後手が置く)
   let stone_col_self, stone_col_opponent;
   if (turn_sente) {
     stone_col_self = "黒";
@@ -90,8 +90,7 @@ function putStone(i, turn_sente) {
     stone_col_self = "白";
     stone_col_opponent = "黒";
   }
-  let row = Math.floor(i / size);
-  let col = i % size;
+  let i = row * size + col;
   document.getElementById("history").innerHTML += `<br>&ensp;${stone_col_self}石を置いた: (${row + 1}, ${col + 1})`;
   str_board = str_board.substr(0, i) + String(2 - Number(turn_sente)) + str_board.substr(i + 1);
 
@@ -178,22 +177,23 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   // 石を置く場所の設定
   for (let i = 0; i < size * size; i++) {
+    let row_sente = Math.floor(i / size);
+    let col_sente = i % size;
     const cell = board.children[i];
     cell.addEventListener("click", async function () {
       if (isLocked) return;
       // すでに石が置かれていないことを確認
       if (!this.firstChild) {
-        putStone(i, true);
+        putStone(row_sente, col_sente, true);
         checkCalledGame(); // 終局判定 (アゲハマ 8 個以上)
 
         // 相手の番
         if (!isLocked) {
-          let [row, col, _] = await getPlaceScore(str_board);
-          let j = row * size + col;
-          if (row == -1) {
+          let [row_gote, col_gote, _] = await getPlaceScore(str_board);
+          if (row_gote == -1) {
             passTurn(false);
           } else {
-            putStone(j, false);
+            putStone(row_gote, col_gote, false);
           }
           checkCalledGame(); // 終局判定 (アゲハマ 8 個以上)
         }
@@ -208,12 +208,11 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     // 相手の番
     if (!isLocked) {
-      let [row, col, _] = await getPlaceScore(str_board);
-      let j = row * size + col;
-      if (row == -1) {
+      let [row_gote, col_gote, _] = await getPlaceScore(str_board);
+      if (row_gote == -1) {
         passTurn(false);
       } else {
-        putStone(j, false);
+        putStone(row_gote, col_gote, false);
       }
       checkCalledGame(); // 終局判定 (アゲハマ 8 個以上)
     }
