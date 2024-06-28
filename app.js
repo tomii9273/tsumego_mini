@@ -16,7 +16,7 @@ var hama_gote = 0;
 var isLocked = false; // 勝負がついたらロックして石を置けないようにする
 
 function strToBoard(str_board, board) {
-  // 盤面文字列 (9 桁) から盤面を生成
+  // 盤面文字列 (9 桁以上) から盤面を生成
   for (let i = 0; i < size * size; i++) {
     const nextCell = board.children[i];
     if (nextCell.firstChild) {
