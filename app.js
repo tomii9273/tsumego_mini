@@ -163,6 +163,16 @@ function passTurn(turn_sente) {
   board = strToBoard(str_board, board); // 盤面の反映
 }
 
+async function moveWhite() {
+  // 白の手番 (最善手を選択)
+  let [row_gote, col_gote, _] = await getPlaceScore(str_board);
+  if (row_gote == -1) {
+    passTurn(false); // パス
+  } else {
+    putStone(row_gote, col_gote, false); // 石を置く
+  }
+}
+
 document.addEventListener("DOMContentLoaded", async function () {
   let board = document.getElementById("board"); // 盤面表示用
   const historyDiv = document.getElementById("history"); // 履歴表示用
@@ -189,14 +199,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         putStone(row_sente, col_sente, true);
         checkCalledGame(); // 終局判定 (アゲハマ 8 個以上)
 
-        // 相手の番
         if (!isLocked) {
-          let [row_gote, col_gote, _] = await getPlaceScore(str_board);
-          if (row_gote == -1) {
-            passTurn(false);
-          } else {
-            putStone(row_gote, col_gote, false);
-          }
+          moveWhite(); // 相手の番
           checkCalledGame(); // 終局判定 (アゲハマ 8 個以上)
         }
       }
@@ -206,16 +210,10 @@ document.addEventListener("DOMContentLoaded", async function () {
   // パスボタンの設定
   passButton.addEventListener("click", async function () {
     if (isLocked) return;
-    passTurn(true);
+    passTurn(true); // パス
 
-    // 相手の番
     if (!isLocked) {
-      let [row_gote, col_gote, _] = await getPlaceScore(str_board);
-      if (row_gote == -1) {
-        passTurn(false);
-      } else {
-        putStone(row_gote, col_gote, false);
-      }
+      moveWhite(); // 相手の番
       checkCalledGame(); // 終局判定 (アゲハマ 8 個以上)
     }
   });
