@@ -46,6 +46,7 @@ function strToBoard(str_board, board) {
 
 async function initState(board_num) {
   // ゲーム状態の初期化
+  console.assert(!isNaN(board_num) && Number.isInteger(board_num) && 0 <= board_num && board_num < N_INITBOARD);
   str_board = (await getBoardStr(board_num))["board_str"] + "100000";
   board = strToBoard(str_board, board);
   isLocked = false;
@@ -59,7 +60,14 @@ async function initState(board_num) {
 
 async function resetState() {
   // 「作成」ボタンによるゲーム状態の再設定
-  board_num = document.getElementById("boardNum").value; // 0-indexed
+
+  // フォームでは数字以外にも一部記号を受け付けるが、"1-2" のような不正な入力は空文字列扱いになる。Number(空文字列) は 0 になる。
+  board_num = Number(document.getElementById("boardNum").value); // 0-indexed
+  // board_num が正しいか判定、不正ならランダムに設定
+  if (!(!isNaN(board_num) && Number.isInteger(board_num) && 0 <= board_num && board_num < N_INITBOARD)) {
+    board_num = Math.floor(Math.random() * N_INITBOARD);
+    console.log("board_num is invalid. Set random board_num:", board_num);
+  }
   initState(board_num);
 }
 
