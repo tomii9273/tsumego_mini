@@ -74,10 +74,10 @@ async function resetState() {
 function checkCalledGame() {
   // 終局判定 (アゲハマ 8 個以上)
   if (hama_sente >= 8) {
-    document.getElementById("history").innerHTML += "<br>ゲーム終了<br>&ensp;10 点差で自分の勝ち";
+    document.getElementById("history").innerHTML += "<br>ゲーム終了<br>&ensp;得点: 10 点";
     isLocked = true;
   } else if (hama_gote >= 8) {
-    document.getElementById("history").innerHTML += "<br>ゲーム終了<br>&ensp;10 点差で相手の勝ち";
+    document.getElementById("history").innerHTML += "<br>ゲーム終了<br>&ensp;得点: -10 点";
     isLocked = true;
   }
 }
@@ -260,13 +260,7 @@ function countStone(str_board) {
   let n_black = (str_board.substr(0, SIZE * SIZE).match(/1/g) || []).length;
   let n_white = (str_board.substr(0, SIZE * SIZE).match(/2/g) || []).length;
   output += `<br>&ensp;黒石: ${n_black} 個、白石: ${n_white} 個`;
-  if (n_black > n_white) {
-    output += `<br>&ensp;${n_black - n_white} 点差で自分の勝ち`;
-  } else if (n_black < n_white) {
-    output += `<br>&ensp;${n_white - n_black} 点差で相手の勝ち`;
-  } else {
-    output += "<br>&ensp;引き分け";
-  }
+  output += `<br>&ensp;得点: ${n_black - n_white} 点`;
   return output;
 }
 
