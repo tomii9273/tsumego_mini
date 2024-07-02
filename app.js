@@ -1,5 +1,7 @@
 const SIZE = 3; // 盤面の一辺の交点数
 const N_INITBOARD = 5026; // 初期盤面の総数 (SQL で取得できるが、時間短縮のため直接指定)
+const N_HAMA_CALLED = 8; // コールド終局になるアゲハマの数
+const PTS_CALLED = 10; // コールド終局の場合の両者の得点の絶対値
 
 const DIRECTION = [
   [-1, 0], // 上
@@ -72,20 +74,28 @@ async function resetState() {
 }
 
 function checkCalledGame() {
-  // 終局判定 (アゲハマ 8 個以上)
-  if (hama_sente >= 8) {
-    document.getElementById("history").innerHTML += "<br>ゲーム終了<br>&ensp;得点: 10 点";
-    isLocked = true;
-  } else if (hama_gote >= 8) {
-    document.getElementById("history").innerHTML += "<br>ゲーム終了<br>&ensp;得点: -10 点";
+  // コールド終局 (アゲハマ N_HAMA_CALLED 個以上) の判定と処理
+  // 勝者 PTS_CALLED 点、敗者 -PTS_CALLED 点とする
+  // NOTE: 実際は黒はコールド勝ちできない (白はパスをし続けるほうがコールド負けより常にマシなので)
+  if (hama_sente >= N_HAMA_CALLED || hama_gote >= N_HAMA_CALLED) {
+    console.log("Called game", (-1) ** Number(hama_gote >= N_HAMA_CALLED) * PTS_CALLED);
+    document.getElementById("history").innerHTML += `<br>ゲーム終了<br>&ensp;得点: ${
+      (-1) ** Number(hama_gote >= N_HAMA_CALLED) * PTS_CALLED
+    } 点`;
     isLocked = true;
   }
 }
 
 function checkConsecutivePass() {
-  // 終局判定 (連続パス)
+  // 通常終局 (連続パス) の判定と処理
+  // 盤上の石の数をカウントして得点を計算
   if (str_board.charAt(SIZE * SIZE + 1) == "1") {
-    document.getElementById("history").innerHTML += "<br>ゲーム終了" + countStone(str_board);
+    let n_black = (str_board.substr(0, SIZE * SIZE).match(/1/g) || []).length;
+    let n_white = (str_board.substr(0, SIZE * SIZE).match(/2/g) || []).length;
+    let output = "<br>ゲーム終了";
+    output += `<br>&ensp;黒石: ${n_black} 個、白石: ${n_white} 個`;
+    output += `<br>&ensp;得点: ${n_black - n_white} 点`;
+    document.getElementById("history").innerHTML += output;
     isLocked = true;
   }
 }
@@ -205,11 +215,11 @@ document.addEventListener("DOMContentLoaded", async function () {
       // すでに石が置かれていないことを確認
       if (!this.firstChild) {
         putStone(row_sente, col_sente, true);
-        checkCalledGame(); // 終局判定 (アゲハマ 8 個以上)
+        checkCalledGame();
 
         if (!isLocked) {
           await moveWhite(); // 相手の番
-          checkCalledGame(); // 終局判定 (アゲハマ 8 個以上)
+          checkCalledGame();
         }
       }
     });
@@ -222,7 +232,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     if (!isLocked) {
       await moveWhite(); // 相手の番
-      checkCalledGame(); // 終局判定 (アゲハマ 8 個以上)
+      checkCalledGame();
     }
   });
 });
@@ -252,16 +262,6 @@ function checkKou(str_board, row, col, n_taken_stone_sum, my_stone_col) {
     return ng_place;
   }
   return [-1, -1];
-}
-
-function countStone(str_board) {
-  // 盤面文字列 (9 桁または 15 桁) から、盤上の石の数をカウントして勝敗を判定
-  output = "";
-  let n_black = (str_board.substr(0, SIZE * SIZE).match(/1/g) || []).length;
-  let n_white = (str_board.substr(0, SIZE * SIZE).match(/2/g) || []).length;
-  output += `<br>&ensp;黒石: ${n_black} 個、白石: ${n_white} 個`;
-  output += `<br>&ensp;得点: ${n_black - n_white} 点`;
-  return output;
 }
 
 function takeStone(prow, pcol, board_str) {
