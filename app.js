@@ -208,7 +208,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         checkCalledGame(); // 終局判定 (アゲハマ 8 個以上)
 
         if (!isLocked) {
-          moveWhite(); // 相手の番
+          await moveWhite(); // 相手の番
           checkCalledGame(); // 終局判定 (アゲハマ 8 個以上)
         }
       }
@@ -221,7 +221,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     passTurn(true); // パス
 
     if (!isLocked) {
-      moveWhite(); // 相手の番
+      await moveWhite(); // 相手の番
       checkCalledGame(); // 終局判定 (アゲハマ 8 個以上)
     }
   });
