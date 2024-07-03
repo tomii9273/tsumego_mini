@@ -276,11 +276,7 @@ function checkKou(str_board, row, col, n_taken_stone_sum, my_stone_color) {
 function takeStone(prow, pcol, board_str) {
   // (prow, pcol) と連結する石を取れるなら取って、盤面と取った石の数を返す
 
-  let board = [
-    [0, 0, 0],
-    [0, 0, 0],
-    [0, 0, 0],
-  ];
+  let board = Array.from({ length: SIZE }, () => Array(SIZE).fill(0));
   for (let row = 0; row < SIZE; row++) {
     for (let col = 0; col < SIZE; col++) {
       board[row][col] = Number(board_str[row * SIZE + col]);
