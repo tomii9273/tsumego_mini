@@ -17,6 +17,11 @@ var hama_gote = 0;
 var isLocked = false; // 勝負がついたらロックして石を置けないようにする
 var max_score = PTS_CALLED + 1; // 黒が達成可能な最大得点
 
+function printLog(str) {
+  // ログを表示
+  document.getElementById("history").innerHTML += str;
+}
+
 function strToBoard(str_board, board) {
   // 盤面文字列 (9 桁以上) から盤面を生成
   for (let idx = 0; idx < SIZE * SIZE; idx++) {
@@ -58,7 +63,7 @@ async function initState(board_num) {
   let [row, col, score] = await getPlaceScore(str_board);
   max_score = score;
   document.getElementById("board_num_str").innerHTML = `No.${String(board_num)} 最大得点:${max_score}`;
-  document.getElementById("history").innerHTML += `<br>ゲーム開始 No.${String(board_num)} 最大得点:${max_score}`;
+  printLog(`<br>ゲーム開始 No.${String(board_num)} 最大得点:${max_score}`);
   console.log(`No.${String(board_num)} 最大得点:${max_score} str_board:${str_board} 黒の最善手:(${row},${col})`);
 }
 
@@ -80,7 +85,7 @@ function checkCalledGame() {
   // 勝者 PTS_CALLED 点、敗者 -PTS_CALLED 点とする
   // NOTE: 実際は黒はコールド勝ちできない (白はパスをし続けるほうがコールド負けより常にマシなので)
   if (hama_sente >= N_HAMA_CALLED || hama_gote >= N_HAMA_CALLED) {
-    document.getElementById("history").innerHTML += "<br>ゲーム終了";
+    printLog("<br>ゲーム終了");
     printScoreLock((-1) ** Number(hama_gote >= N_HAMA_CALLED) * PTS_CALLED);
   }
 }
@@ -91,18 +96,18 @@ function checkConsecutivePass() {
   if (str_board.charAt(SIZE * SIZE + 1) == "1") {
     let n_black = (str_board.substr(0, SIZE * SIZE).match(/1/g) || []).length;
     let n_white = (str_board.substr(0, SIZE * SIZE).match(/2/g) || []).length;
-    document.getElementById("history").innerHTML += `<br>ゲーム終了<br>&ensp;黒石: ${n_black} 個、白石: ${n_white} 個`;
+    printLog(`<br>ゲーム終了<br>&ensp;黒石: ${n_black} 個、白石: ${n_white} 個`);
     printScoreLock(n_black - n_white);
   }
 }
 
 function printScoreLock(score) {
   // 終局後処理。得点を表示してロックする
-  document.getElementById("history").innerHTML += `<br>&ensp;得点: ${score} 点`;
+  printLog(`<br>&ensp;得点: ${score} 点`);
   if (score == max_score) {
-    document.getElementById("history").innerHTML += " [最大得点を達成！]";
+    printLog(" [最大得点を達成！]");
   } else if (score > max_score) {
-    document.getElementById("history").innerHTML += " [最大得点超え！？]";
+    printLog(" [最大得点超え！？]");
   }
   isLocked = true;
 }
@@ -118,7 +123,7 @@ function putStone(row, col, turn_sente) {
     stone_col_opponent = "黒";
   }
   let idx = row * SIZE + col;
-  document.getElementById("history").innerHTML += `<br>&ensp;${stone_col_self}石を置いた: (${row + 1}, ${col + 1})`;
+  printLog(`<br>&ensp;${stone_col_self}石を置いた: (${row + 1}, ${col + 1})`);
   str_board = str_board.substr(0, idx) + String(2 - Number(turn_sente)) + str_board.substr(idx + 1);
 
   // 石を取る処理
@@ -138,9 +143,7 @@ function putStone(row, col, turn_sente) {
     hama_gote += taken_stones;
   }
   if (taken_stones > 0) {
-    document.getElementById(
-      "history"
-    ).innerHTML += `<br>&ensp;&ensp;相手の${stone_col_opponent}石 ${taken_stones} 個を取った`;
+    printLog(`<br>&ensp;&ensp;相手の${stone_col_opponent}石 ${taken_stones} 個を取った`);
   }
   let [str_b, n_stone] = takeStone(row, col, str_board);
   str_board = str_b;
@@ -150,7 +153,7 @@ function putStone(row, col, turn_sente) {
     hama_sente += n_stone;
   }
   if (n_stone > 0) {
-    document.getElementById("history").innerHTML += `<br>&ensp;&ensp;自分の${stone_col_self}石 ${n_stone} 個を取られた`;
+    printLog(`<br>&ensp;&ensp;自分の${stone_col_self}石 ${n_stone} 個を取られた`);
   }
 
   // コウの処理
@@ -161,11 +164,7 @@ function putStone(row, col, turn_sente) {
   }
   let [kou_row, kou_col] = checkKou(str_board, row, col, taken_stones, 2 - turn_sente);
   if (kou_row != -1) {
-    document.getElementById(
-      "history"
-    ).innerHTML += `<br>&ensp;&ensp;コウのため次${stone_col_opponent}はここに打てません: (${kou_row + 1}, ${
-      kou_col + 1
-    })`;
+    printLog(`<br>&ensp;&ensp;コウのため次${stone_col_opponent}はここに打てません: (${kou_row + 1}, ${kou_col + 1})`);
     str_board = str_board.substr(0, kou_row * SIZE + kou_col) + "3" + str_board.substr(kou_row * SIZE + kou_col + 1);
   }
   str_board = str_board.substr(0, SIZE * SIZE) + String(1 - turn_sente) + "0" + str_board.substr(SIZE * SIZE + 2);
@@ -182,7 +181,7 @@ function passTurn(turn_sente) {
   } else {
     stone_col_self = "白";
   }
-  document.getElementById("history").innerHTML += `<br>&ensp;${stone_col_self}はパスをした`;
+  printLog(`<br>&ensp;${stone_col_self}はパスをした`);
   checkConsecutivePass(); // 終局判定 (連続パス)
   str_board = str_board.substr(0, SIZE * SIZE) + String(1 - turn_sente) + "1" + str_board.substr(SIZE * SIZE + 2);
   board = strToBoard(str_board, board); // 盤面の反映
@@ -200,7 +199,6 @@ async function moveWhite() {
 
 document.addEventListener("DOMContentLoaded", async function () {
   let board = document.getElementById("board"); // 盤面表示用
-  const historyDiv = document.getElementById("history"); // 履歴表示用
   const passButton = document.getElementById("pass"); // passボタン
 
   for (let idx = 0; idx < SIZE * SIZE; idx++) {
