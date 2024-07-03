@@ -244,7 +244,9 @@ document.addEventListener("DOMContentLoaded", async function () {
   });
 });
 
-function checkKou(str_board, row, col, n_taken_stone_sum, my_stone_col) {
+function checkKou(str_board, row, col, n_taken_stone_sum, my_stone_color) {
+  // 手番 my_stone_color が (row, col) に置いて、相手の石 n_taken_stone_sum 個を取った際に、コウが発生するかを調べる。
+  // 発生するなら次置けない座標を返す。発生しないなら [-1, -1] を返す。
   if (n_taken_stone_sum != 1) {
     return [-1, -1];
   }
@@ -256,7 +258,7 @@ function checkKou(str_board, row, col, n_taken_stone_sum, my_stone_col) {
       row + drow < SIZE &&
       0 <= col + dcol &&
       col + dcol < SIZE &&
-      str_board.charAt((row + drow) * SIZE + col + dcol) == 3 - my_stone_col
+      str_board.charAt((row + drow) * SIZE + col + dcol) == 3 - my_stone_color
     ) {
       cnt += 1;
     } else if (!(0 <= row + drow && row + drow < SIZE && 0 <= col + dcol && col + dcol < SIZE)) {
