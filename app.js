@@ -15,6 +15,7 @@ var str_board = "";
 var hama_sente = 0;
 var hama_gote = 0;
 var isLocked = false; // 勝負がついたらロックして石を置けないようにする
+var max_score = PTS_CALLED + 1; // 黒が達成可能な最大得点
 
 function strToBoard(str_board, board) {
   // 盤面文字列 (9 桁以上) から盤面を生成
@@ -55,9 +56,10 @@ async function initState(board_num) {
   hama_sente = 0;
   hama_gote = 0;
   let [row, col, score] = await getPlaceScore(str_board);
-  document.getElementById("board_num_str").innerHTML = `No.${String(board_num)} 最大得点:${score}`;
-  document.getElementById("history").innerHTML += `<br>ゲーム開始 No.${String(board_num)} 最大得点:${score}`;
-  console.log(`No.${String(board_num)} 最大得点:${score} str_board:${str_board} 黒の最善手:(${row},${col})`);
+  max_score = score;
+  document.getElementById("board_num_str").innerHTML = `No.${String(board_num)} 最大得点:${max_score}`;
+  document.getElementById("history").innerHTML += `<br>ゲーム開始 No.${String(board_num)} 最大得点:${max_score}`;
+  console.log(`No.${String(board_num)} 最大得点:${max_score} str_board:${str_board} 黒の最善手:(${row},${col})`);
 }
 
 async function resetState() {
@@ -78,11 +80,8 @@ function checkCalledGame() {
   // 勝者 PTS_CALLED 点、敗者 -PTS_CALLED 点とする
   // NOTE: 実際は黒はコールド勝ちできない (白はパスをし続けるほうがコールド負けより常にマシなので)
   if (hama_sente >= N_HAMA_CALLED || hama_gote >= N_HAMA_CALLED) {
-    console.log("Called game", (-1) ** Number(hama_gote >= N_HAMA_CALLED) * PTS_CALLED);
-    document.getElementById("history").innerHTML += `<br>ゲーム終了<br>&ensp;得点: ${
-      (-1) ** Number(hama_gote >= N_HAMA_CALLED) * PTS_CALLED
-    } 点`;
-    isLocked = true;
+    document.getElementById("history").innerHTML += "<br>ゲーム終了";
+    printScoreLock((-1) ** Number(hama_gote >= N_HAMA_CALLED) * PTS_CALLED);
   }
 }
 
@@ -92,12 +91,20 @@ function checkConsecutivePass() {
   if (str_board.charAt(SIZE * SIZE + 1) == "1") {
     let n_black = (str_board.substr(0, SIZE * SIZE).match(/1/g) || []).length;
     let n_white = (str_board.substr(0, SIZE * SIZE).match(/2/g) || []).length;
-    let output = "<br>ゲーム終了";
-    output += `<br>&ensp;黒石: ${n_black} 個、白石: ${n_white} 個`;
-    output += `<br>&ensp;得点: ${n_black - n_white} 点`;
-    document.getElementById("history").innerHTML += output;
-    isLocked = true;
+    document.getElementById("history").innerHTML += `<br>ゲーム終了<br>&ensp;黒石: ${n_black} 個、白石: ${n_white} 個`;
+    printScoreLock(n_black - n_white);
   }
+}
+
+function printScoreLock(score) {
+  // 終局後処理。得点を表示してロックする
+  document.getElementById("history").innerHTML += `<br>&ensp;得点: ${score} 点`;
+  if (score == max_score) {
+    document.getElementById("history").innerHTML += " [最大得点を達成！]";
+  } else if (score > max_score) {
+    document.getElementById("history").innerHTML += " [最大得点超え！？]";
+  }
+  isLocked = true;
 }
 
 function putStone(row, col, turn_sente) {
