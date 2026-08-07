@@ -1,0 +1,6 @@
+# SQLite生成元のデータはHeroku実行時には使用しない
+/data_3.json
+/data_3.csv
+/filtered_init_boards.json
+/filtered_init_boards.csv
+/init_boards.json
